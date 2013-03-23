@@ -1,6 +1,8 @@
 <?php
 
-namespace Navarr;
+namespace Navarr\Socket;
+
+use Navarr\Socket\Exception\SocketException;
 
 /**
  * Class Socket
@@ -38,7 +40,7 @@ class Socket
     {
         $return = @socket_accept($this->resource);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return new self($return);
     }
@@ -47,7 +49,7 @@ class Socket
     {
         $return = socket_bind($this->resource, $address, $port);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return true;
     }
@@ -61,7 +63,7 @@ class Socket
     {
         $return = socket_connect($this->resource, $address, $port);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return true;
     }
@@ -79,7 +81,7 @@ class Socket
     {
         $return = @socket_create($domain, $type, $protocol);
         if ($return === false) {
-            Socket\Exception::throwByResource();
+            SocketException::throwByResource();
         }
         $socket = new self($return);
         $socket->domain = $domain;
@@ -92,7 +94,7 @@ class Socket
     {
         $return = @socket_create_listen($port, $backlog);
         if ($return === false) {
-            Socket\Exception::throwByResource();
+            SocketException::throwByResource();
         }
         $socket = new self($return);
         $socket->domain = AF_INET;
@@ -104,7 +106,7 @@ class Socket
         $array = array();
         $return = socket_create_pair($domain, $type, $protocol, $array);
         if ($return === false) {
-            Socket\Exception::throwByResource();
+            SocketException::throwByResource();
         }
         $sockets = self::constructFromResources($array);
         foreach ($sockets as $socket) {
@@ -119,7 +121,7 @@ class Socket
     {
         $return = socket_get_option($this->resource, $level, $optname);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return $return;
     }
@@ -128,7 +130,7 @@ class Socket
     {
         $return = socket_getpeername($this->resource, $address, $port);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return $return;
     }
@@ -140,7 +142,7 @@ class Socket
         }
         $return = socket_getsockname($this->resource, $address, $port);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return $return;
     }
@@ -154,7 +156,7 @@ class Socket
     {
         $return = socket_listen($this->resource, $backlog);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return true;
     }
@@ -163,7 +165,7 @@ class Socket
     {
         $return = socket_read($this->resource, $length, $type);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return $return;
     }
@@ -172,7 +174,7 @@ class Socket
     {
         $return = socket_recv($this->resource, $buffer, $length, $flags);
         if ($return === false) {
-            Socket\Exception::throwByResource($this->resource);
+            SocketException::throwByResource($this->resource);
         }
         return $return;
     }

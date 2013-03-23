@@ -1,8 +1,8 @@
 <?php
 
-namespace Navarr\Socket;
+namespace Navarr\Socket\Exception;
 
-class Exception extends \Exception
+class SocketException extends \Exception
 {
     protected $message = 'Socket Exception';
 
