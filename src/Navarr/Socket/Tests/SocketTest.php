@@ -20,4 +20,12 @@ class SocketTest extends \PHPUnit_Framework_TestCase
         $reflectionProperty->setAccessible(true);
         $this->assertEquals('resource', gettype($reflectionProperty->getValue($socket)));
     }
+
+    /**
+     * @expectedException Navarr\Socket\Exception
+     */
+    public function testSocketCreateWithBadValuesThrowsSocketException()
+    {
+        Socket::create(9001, 9001, 9001);
+    }
 }
