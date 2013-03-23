@@ -34,7 +34,7 @@ class Socket
      */
     public function __destruct()
     {
-        socket_close($this->resource);
+        @socket_close($this->resource);
         $this->resource = null;
     }
 
@@ -59,7 +59,7 @@ class Socket
     public function close()
     {
         unset(self::$map[(string)$this->resource]);
-        socket_close($this->resource);
+        @socket_close($this->resource);
     }
 
     public function connect($address, $port = 0)

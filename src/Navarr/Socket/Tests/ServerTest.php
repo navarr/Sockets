@@ -8,8 +8,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testServer()
     {
-        $this->markTestIncomplete('Can\'t Yet Test Servers');
-        return;
+        $this->markTestIncomplete("Can't Yet Test Servers");
 
         $server = new Server('127.0.0.1', 9002);
         $server->addHook(
@@ -17,7 +16,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             function ($server, $client, $input) {
                 $this->assertTrue($server instanceof Server);
                 $this->assertTrue($client instanceof Socket);
-                return 2;
+                return Server::RETURN_HALT_SERVER;
             }
         );
         $server->run();
