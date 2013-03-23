@@ -10,5 +10,8 @@
     ],
     "require-dev": {
         "phpunit/phpunit": "3.7.18"
+    },
+    "require": {
+        "symfony/class-loader": "2.2.x-dev"
     }
 }
