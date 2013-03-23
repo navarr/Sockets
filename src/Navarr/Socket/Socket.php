@@ -17,6 +17,7 @@ class Socket
     protected $domain = null;
     protected $type = null;
     protected $protocol = null;
+    protected static $map = array();
 
     /**
      * Sets up the Socket Resource
@@ -25,6 +26,7 @@ class Socket
     private function __construct($resource)
     {
         $this->resource = $resource;
+        self::$map[(string)$resource] = $this;
     }
 
     /**
@@ -56,6 +58,7 @@ class Socket
 
     public function close()
     {
+        unset(self::$map[(string)$this->resource]);
         socket_close($this->resource);
     }
 
@@ -173,6 +176,74 @@ class Socket
     public function receive(&$buffer, $length, $flags)
     {
         $return = socket_recv($this->resource, $buffer, $length, $flags);
+        if ($return === false) {
+            SocketException::throwByResource($this->resource);
+        }
+        return $return;
+    }
+
+    /**
+     * @param Socket[] &$read
+     * @param Socket[] &$write
+     * @param Socket[] &$except
+     * @param int $timeoutSeconds
+     * @param int $timeoutMilliseconds
+     * @throws SocketException
+     * @return int
+     */
+    public static function select(&$read, &$write, &$except, $timeoutSeconds, $timeoutMilliseconds = 0)
+    {
+        $readSockets = null;
+        $writeSockets = null;
+        $exceptSockets = null;
+        if ($read !== null) {
+            $readSockets = array();
+            foreach ($read as $socket) {
+                $readSockets[] = $socket->resource;
+            }
+        }
+        if ($write !== null) {
+            $writeSockets = array();
+            foreach ($write as $socket) {
+                $writeSockets[] = $socket->resource;
+            }
+        }
+        if ($except !== null) {
+            $exceptSockets = array();
+            foreach ($except as $socket) {
+                $exceptSockets[] = $socket->resource;
+            }
+        }
+
+        $return = socket_select($readSockets, $writeSockets, $exceptSockets, $timeoutSeconds, $timeoutMilliseconds);
+
+        if ($return === false) {
+            SocketException::throwByResource();
+        }
+        $read = array();
+        $write = array();
+        $except = array();
+        if (isset($readSockets)) {
+            foreach ($readSockets as $rawSocket) {
+                $read[] = self::$map[(string)$rawSocket];
+            }
+        }
+        if (isset($writeSockets)) {
+            foreach ($writeSockets as $rawSocket) {
+                $write[] = self::$map[(string)$rawSocket];
+            }
+        }
+        if (isset($exceptSockets)) {
+            foreach ($exceptSockets as $rawSocket) {
+                $except[] = self::$map[(string)$rawSocket];
+            }
+        }
+        return $return;
+    }
+
+    public function write($buffer, $length = 0)
+    {
+        $return = socket_write($this->resource, $buffer, $length);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
