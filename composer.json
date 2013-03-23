@@ -1,0 +1,14 @@
+{
+    "name": "Navarr/Socket",
+    "description": "Sockets in PHP",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Navarr Barnier",
+            "email": "me@navarr.me"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "3.7.18"
+    }
+}
