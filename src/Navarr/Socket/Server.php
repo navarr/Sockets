@@ -48,6 +48,12 @@ class Server
     protected $clients = array();
 
     /**
+     * Type of Read to use.  One of PHP_BINARY_READ, PHP_NORMAL_READ
+     * @var int
+     */
+    protected $readType = PHP_BINARY_READ;
+
+    /**
      * Constant String for Generic Connection Hook
      */
     const HOOK_CONNECT = '__NAVARR_SOCKET_SERVER_CONNECT__';
@@ -132,18 +138,16 @@ class Server
 
         // Check for input from each client
         foreach ($this->clients as $client) {
-            if (in_array($client, $read)) {
-                $input = $client->read($this->maxRead);
-                if ($input === null) {
-                    if ($this->disconnect($client) === false) {
-                        // This only happens when a hook tells the server to shut itself down.
-                        return false;
-                    }
-                } else {
-                    if ($this->triggerHooks(self::HOOK_INPUT, $client, $input) === false) {
-                        // This only happens when a hook tells the server to shut itself down.
-                        return false;
-                    }
+            $input = $client->read($this->maxRead, $this->readType);
+            if ($input === null) {
+                if ($this->disconnect($client) === false) {
+                    // This only happens when a hook tells the server to shut itself down.
+                    return false;
+                }
+            } else {
+                if ($this->triggerHooks(self::HOOK_INPUT, $client, $input) === false) {
+                    // This only happens when a hook tells the server to shut itself down.
+                    return false;
                 }
             }
         }
