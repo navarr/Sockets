@@ -8,7 +8,7 @@
             "email": "me@navarr.me"
         }
     ],
-    "require-dev": {
+    "require": {
         "phpunit/phpunit": "3.7.18",
         "symfony/class-loader": "2.2.x-dev"
     }
