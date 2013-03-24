@@ -29,4 +29,13 @@ class SocketTest extends \PHPUnit_Framework_TestCase
     {
         Socket::create(9001, 9001, 9001);
     }
+
+    /**
+     * @expectedException \Navarr\Socket\Exception\SocketException
+     */
+    public function testSocketWithResourceThrowsSocketException()
+    {
+        $socket = Socket::create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $socket->write('test', 4);
+    }
 }

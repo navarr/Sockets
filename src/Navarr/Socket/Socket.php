@@ -49,7 +49,7 @@ class Socket
 
     public function bind($address, $port = 0)
     {
-        $return = socket_bind($this->resource, $address, $port);
+        $return = @socket_bind($this->resource, $address, $port);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -64,7 +64,7 @@ class Socket
 
     public function connect($address, $port = 0)
     {
-        $return = socket_connect($this->resource, $address, $port);
+        $return = @socket_connect($this->resource, $address, $port);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -107,7 +107,7 @@ class Socket
     public static function createPair($domain, $type, $protocol)
     {
         $array = array();
-        $return = socket_create_pair($domain, $type, $protocol, $array);
+        $return = @socket_create_pair($domain, $type, $protocol, $array);
         if ($return === false) {
             SocketException::throwByResource();
         }
@@ -131,7 +131,7 @@ class Socket
 
     public function getPeerName(&$address, &$port)
     {
-        $return = socket_getpeername($this->resource, $address, $port);
+        $return = @socket_getpeername($this->resource, $address, $port);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -152,7 +152,7 @@ class Socket
 
     public static function importStream($stream)
     {
-        return new self(socket_import_stream($stream));
+        return new self(@socket_import_stream($stream));
     }
 
     public function listen($backlog = 0)
@@ -166,7 +166,7 @@ class Socket
 
     public function read($length, $type = PHP_BINARY_READ)
     {
-        $return = socket_read($this->resource, $length, $type);
+        $return = @socket_read($this->resource, $length, $type);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -175,7 +175,7 @@ class Socket
 
     public function receive(&$buffer, $length, $flags)
     {
-        $return = socket_recv($this->resource, $buffer, $length, $flags);
+        $return = @socket_recv($this->resource, $buffer, $length, $flags);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -215,7 +215,7 @@ class Socket
             }
         }
 
-        $return = socket_select($readSockets, $writeSockets, $exceptSockets, $timeoutSeconds, $timeoutMilliseconds);
+        $return = @socket_select($readSockets, $writeSockets, $exceptSockets, $timeoutSeconds, $timeoutMilliseconds);
 
         if ($return === false) {
             SocketException::throwByResource();
@@ -243,7 +243,7 @@ class Socket
 
     public function write($buffer, $length = 0)
     {
-        $return = socket_write($this->resource, $buffer, $length);
+        $return = @socket_write($this->resource, $buffer, $length);
         if ($return === false) {
             SocketException::throwByResource($this->resource);
         }
@@ -253,9 +253,9 @@ class Socket
     public function setBlocking($bool)
     {
         if ($bool) {
-            socket_set_block($this->resource);
+            @socket_set_block($this->resource);
         } else {
-            socket_set_nonblock($this->resource);
+            @socket_set_nonblock($this->resource);
         }
     }
 }
