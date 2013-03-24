@@ -1,4 +1,4 @@
-# Sockets
+# Sockets [![Build Status](https://travis-ci.org/navarr/Sockets.png)](https://travis-ci.org/navarr/Sockets)
 
 Sockets is a PHP Library intent on making working with PHP Sockets easier, including the creation and management of a Socket Server.
 
