@@ -5,4 +5,4 @@ php:
 before_script:
   - composer install
 script:
-  - phpunit --bootstrap=bootstrap.php
+  - phpunit --bootstrap bootstrap.php
