@@ -1,0 +1,14 @@
+<phpunit>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+            <exclude>
+                <directory suffix=".php">src/Navarr/Socket/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="coverage" />
+        <log type="coverage-text" target="php://stdout" />
+    </logging>
+</phpunit>
