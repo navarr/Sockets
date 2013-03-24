@@ -22,42 +22,34 @@ Using SocketServer is supposed to be an easy and trivial task (and the class sho
 use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
 
-function smartWrite(Socket $client, $message, $eol = "\r\n")
+class EchoServer extends Server
 {
-    $message .= $eol;
-    return $client->write($message, strlen($message));
+    public function __construct($ip = null, $port = 7)
+    {
+        parent::__construct($ip, 7);
+        $this->addHook(Server::HOOK_CONNECT, array($this, 'onConnect'));
+        $this->addHook(Server::HOOK_INPUT, array($this, 'onInput'));
+        $this->addHook(Server::HOOK_DISCONNECT, array($this, 'onDisconnect'));
+        $this->run();
+    }
+
+    public function onConnect(Server $server, Socket $client, $message)
+    {
+        echo 'Connection Established',"\n";
+    }
+
+    public function onInput(Server $server, Socket $client, $message)
+    {
+        echo 'Received "',$message,'"',"\n";
+        $client->write($message, strlen($message));
+    }
+
+    public function onDisconnect(Server $server, Socket $client, $message)
+    {
+        echo 'Disconnection',"\n";
+    }
 }
 
-$server = new Server('0.0.0.0', 31337);
-$server->addHook(
-    Server::HOOK_CONNECT,
-    function (Server $server, Socket $client, $message) {
-        smartWrite($client, "String? ", '');
-        return true;
-    }
-);
-$server->addHook(
-    Server::HOOK_INPUT,
-    function (Server $server, Socket $client, $message) {
+$server = new EchoServer('0.0.0.0');
 
-        // Filter out \r\n's
-        $trim = trim($message);
-        if (empty($trim)) {
-            return true;
-        }
-
-        if (strtolower($trim) == "quit") {
-            smartWrite($client, "Oh... Goodbye...");
-            // This is a gotcha.  These functions should probably return a Client wrapper for the Socket
-            $server->disconnect($client);
-            return true;
-        }
-
-        $return = strrev($trim);
-        smartWrite($client, $return);
-        smartWrite($client, "String? ", '');
-        return true;
-    }
-);
-$server->run();
 ```

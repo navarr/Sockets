@@ -95,6 +95,11 @@ class Server
         $this->masterSocket->listen();
     }
 
+    public function __destruct()
+    {
+        $this->masterSocket->close();
+    }
+
     /**
      * Run the Server, forever
      * @return void
@@ -138,8 +143,8 @@ class Server
 
         // Check for input from each client
         foreach ($this->clients as $client) {
-            $input = $client->read($this->maxRead, $this->readType);
-            if ($input === null) {
+            $input = $this->read($client);
+            if ($input === '') {
                 if ($this->disconnect($client) === false) {
                     // This only happens when a hook tells the server to shut itself down.
                     return false;
@@ -154,6 +159,16 @@ class Server
 
         // Tells self::run to Continue the Loop
         return true;
+    }
+
+    /**
+     * Overrideable Read Functionality
+     * @param Socket $client
+     * @return bool|string
+     */
+    protected function read(Socket $client)
+    {
+        return $client->read($this->maxRead, $this->readType);
     }
 
     /**
