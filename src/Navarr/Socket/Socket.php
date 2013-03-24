@@ -249,4 +249,13 @@ class Socket
         }
         return $return;
     }
+
+    public function setBlocking($bool)
+    {
+        if ($bool) {
+            socket_set_block($this->resource);
+        } else {
+            socket_set_nonblock($this->resource);
+        }
+    }
 }

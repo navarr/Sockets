@@ -123,8 +123,7 @@ class Server
     protected function loopOnce()
     {
         // Get all the Sockets we should be reading from
-        $read[0] = $this->masterSocket;
-        array_merge($read, $this->clients);
+        $read = array_merge(array($this->masterSocket), $this->clients);
 
         // Set up a block call to socket_select
         $write = null;
@@ -133,6 +132,7 @@ class Server
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
+            unset($read[array_search($this->masterSocket, $read)]);
             $socket = $this->masterSocket->accept();
             $this->clients[] = $socket;
             if ($this->triggerHooks(self::HOOK_CONNECT, $socket) === false) {
@@ -142,7 +142,7 @@ class Server
         }
 
         // Check for input from each client
-        foreach ($this->clients as $client) {
+        foreach ($read as $client) {
             $input = $this->read($client);
             if ($input === '') {
                 if ($this->disconnect($client) === false) {
