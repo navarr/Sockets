@@ -38,6 +38,11 @@ class Socket
         $this->resource = null;
     }
 
+    public function __toString()
+    {
+        return (string)$this->resource;
+    }
+
     public function accept()
     {
         $return = @socket_accept($this->resource);
