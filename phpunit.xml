@@ -1,4 +1,9 @@
-<phpunit>
+<phpunit bootstrap="bootstrap.php">
+    <testsuites>
+        <testsuite name="Navarr/Sockets Tests">
+            <directory>src/Navarr/Socket/Tests</directory>
+        </testsuite>
+    </testsuites>
     <filter>
         <whitelist>
             <directory suffix=".php">src</directory>
