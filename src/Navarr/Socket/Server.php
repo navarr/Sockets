@@ -128,7 +128,7 @@ class Server
         // Set up a block call to socket_select
         $write = null;
         $except = null;
-        Socket::select($read, $write, $except, 0);
+        Socket::select($read, $write, $except, null);
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
