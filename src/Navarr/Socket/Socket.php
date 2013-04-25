@@ -26,7 +26,7 @@ class Socket
     private function __construct($resource)
     {
         $this->resource = $resource;
-        self::$map[(string)$resource] = $this;
+        self::$map[(string) $resource] = $this;
     }
 
     /**
@@ -34,13 +34,13 @@ class Socket
      */
     public function __destruct()
     {
-        @socket_close($this->resource);
+        $this->close();
         $this->resource = null;
     }
 
     public function __toString()
     {
-        return (string)$this->resource;
+        return (string) $this->resource;
     }
 
     public function accept()
