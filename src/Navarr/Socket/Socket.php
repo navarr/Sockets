@@ -407,9 +407,24 @@ class Socket
      * @param 
      * @return 
      */
-    public function write($buffer, $length = 0)
+    public function write($buffer, $length = null)
     {
-        $return = @socket_write($this->resource, $buffer, $length);
+        if (null === $length) {
+            $length = strlen($buffer);
+        }
+
+        // make sure everything is written
+        do {
+            $return = @socket_write($this->resource, $buffer, $length);
+
+            if (false !== $return && $return < $length) {
+                $buffer  = substr($buffer, $return);
+                $length -= $return;
+
+            } else {
+                break;
+            }
+        } while (true);
 
         if ($return === false) {
             throw new SocketException($this->resource);
