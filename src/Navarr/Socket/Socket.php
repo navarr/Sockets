@@ -58,7 +58,7 @@ class Socket
         $return = @socket_accept($this->resource);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return new self($return);
@@ -76,7 +76,7 @@ class Socket
         $return = @socket_bind($this->resource, $address, $port);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return true;
@@ -105,7 +105,7 @@ class Socket
         $return = @socket_connect($this->resource, $address, $port);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
         return true;
     }
@@ -136,7 +136,7 @@ class Socket
         $return = @socket_create($domain, $type, $protocol);
 
         if ($return === false) {
-            SocketException::throwByResource();
+            throw new SocketException();
         }
 
         $socket           = new self($return);
@@ -159,7 +159,7 @@ class Socket
         $return = @socket_create_listen($port, $backlog);
 
         if ($return === false) {
-            SocketException::throwByResource();
+            throw new SocketException();
         }
 
         $socket         = new self($return);
@@ -182,7 +182,7 @@ class Socket
         $return = @socket_create_pair($domain, $type, $protocol, $array);
 
         if ($return === false) {
-            SocketException::throwByResource();
+            throw new SocketException();
         }
 
         $sockets = self::constructFromResources($array);
@@ -208,7 +208,7 @@ class Socket
         $return = @socket_get_option($this->resource, $level, $optname);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
@@ -226,7 +226,7 @@ class Socket
         $return = @socket_getpeername($this->resource, $address, $port);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
@@ -248,7 +248,7 @@ class Socket
         $return = @socket_getsockname($this->resource, $address, $port);
         
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
@@ -265,7 +265,7 @@ class Socket
         $return = @socket_import_stream($stream);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return new self($return);
@@ -282,7 +282,7 @@ class Socket
         $return = socket_listen($this->resource, $backlog);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return true;
@@ -300,7 +300,7 @@ class Socket
         $return = @socket_read($this->resource, $length, $type);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
@@ -319,7 +319,7 @@ class Socket
         $return = @socket_recv($this->resource, $buffer, $length, $flags);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
@@ -374,7 +374,7 @@ class Socket
                     );
 
         if ($return === false) {
-            SocketException::throwByResource();
+            throw new SocketException();
         }
 
         $read   = [];
@@ -412,7 +412,7 @@ class Socket
         $return = @socket_write($this->resource, $buffer, $length);
 
         if ($return === false) {
-            SocketException::throwByResource($this->resource);
+            throw new SocketException($this->resource);
         }
 
         return $return;
