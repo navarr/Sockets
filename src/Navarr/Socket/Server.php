@@ -40,7 +40,7 @@ class Server
      * @var int
      */
     protected $maxRead = 1024;
-
+    
     /**
      * Connected Clients
      * @var Socket[]

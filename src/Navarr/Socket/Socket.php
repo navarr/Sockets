@@ -340,8 +340,7 @@ class Socket
         &$except,
         $timeoutSeconds,
         $timeoutMilliseconds = 0
-    )
-    {
+    ) {
         $readSockets   = null;
         $writeSockets  = null;
         $exceptSockets = null;
@@ -366,12 +365,12 @@ class Socket
         }
 
         $return = @socket_select(
-                        $readSockets,
-                        $writeSockets,
-                        $exceptSockets,
-                        $timeoutSeconds,
-                        $timeoutMilliseconds
-                    );
+            $readSockets,
+            $writeSockets,
+            $exceptSockets,
+            $timeoutSeconds,
+            $timeoutMilliseconds
+        );
 
         if ($return === false) {
             throw new SocketException();
