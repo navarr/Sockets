@@ -117,7 +117,7 @@ class Server
 
     /**
      * This is the main server loop.  This code is responsible for adding connections and triggering hooks
-     * @return bool Whether or not to shutdown the erver
+     * @return bool Whether or not to shutdown the server
      * @throws \Navarr\Socket\Exception\SocketException
      */
     protected function loopOnce()
@@ -126,15 +126,16 @@ class Server
         $read = array_merge(array($this->masterSocket), $this->clients);
 
         // Set up a block call to socket_select
-        $write = null;
+        $write  = null;
         $except = null;
         Socket::select($read, $write, $except, null);
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
             unset($read[array_search($this->masterSocket, $read)]);
-            $socket = $this->masterSocket->accept();
+            $socket          = $this->masterSocket->accept();
             $this->clients[] = $socket;
+
             if ($this->triggerHooks(self::HOOK_CONNECT, $socket) === false) {
                 // This only happens when a hook tells the server to shut itself down.
                 return false;
@@ -144,6 +145,7 @@ class Server
         // Check for input from each client
         foreach ($read as $client) {
             $input = $this->read($client);
+
             if ($input === '') {
                 if ($this->disconnect($client) === false) {
                     // This only happens when a hook tells the server to shut itself down.
@@ -180,12 +182,19 @@ class Server
     public function disconnect(Socket $client, $message = '')
     {
         $clientIndex = array_search($client, $this->clients);
-        $return = $this->triggerHooks(self::HOOK_DISCONNECT, $this->clients[$clientIndex], $message);
+        $return      = $this->triggerHooks(
+            self::HOOK_DISCONNECT,
+            $this->clients[$clientIndex],
+            $message
+        );
+
         $this->clients[$clientIndex]->close();
         unset($this->clients[$clientIndex]);
+
         if ($return === self::RETURN_HALT_SERVER) {
             return false;
         }
+
         return true;
     }
 
@@ -201,6 +210,7 @@ class Server
         if (isset($this->hooks[$command])) {
             foreach ($this->hooks[$command] as $callable) {
                 $continue = call_user_func($callable, $this, $client, $input);
+
                 if ($continue === self::RETURN_HALT_HOOK) {
                     break;
                 }
@@ -228,6 +238,7 @@ class Server
                 return;
             }
         }
+
         $this->hooks[$command][] = $callable;
     }
 
@@ -239,8 +250,11 @@ class Server
      */
     public function removeHook($command, $callable)
     {
-        if (isset($this->hooks[$command]) && array_search($callable, $this->hooks[$command]) !== false) {
-            unset($this->hooks[$command][array_search($callable, $this->hooks[$command])]);
+        if (isset($this->hooks[$command]) &&
+            array_search($callable, $this->hooks[$command]) !== false) {
+
+            $hook = array_search($callable, $this->hooks[$command]);
+            unset($this->hooks[$command][$hook]);
         }
     }
 
