@@ -6,23 +6,24 @@ class SocketException extends \Exception
 {
     protected $message = 'Socket Exception';
 
-    public static function throwByResource($resource = null)
+    public function __construct($message = null)
     {
-        if ($resource === null) {
+        if (!$message) {
             $errno = socket_last_error();
+        } elseif (is_resource($message)) {
+            $errno = socket_last_error($message);
         } else {
-            $errno = socket_last_error($resource);
+            return parent::__construct((string) $message);
         }
+
         $error = socket_strerror($errno);
 
-        $exception = new self($error, $errno);
+        parent::__construct($error, $errno);
 
-        if ($resource === null) {
+        if (!$message) {
             socket_clear_error();
         } else {
-            socket_clear_error($resource);
+            socket_clear_error($message);
         }
-
-        throw $exception;
     }
 }
