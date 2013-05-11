@@ -3,8 +3,6 @@
 use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
 
-require '../src.php';
-
 class EchoServer extends Server
 {
     public function __construct($ip = null, $port = 7)
