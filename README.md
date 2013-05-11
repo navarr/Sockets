@@ -14,7 +14,7 @@ It is advised not to seriously use this until I create git tag 1.0.0.  There wil
 
 Using SocketServer is supposed to be an easy and trivial task (and the class should be documented enough to understand what it's doing without me).
 
-### Example of a String Reversal Server
+### Example of an ECHO Server
 
 ```php
 <?php
