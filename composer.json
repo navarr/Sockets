@@ -5,10 +5,22 @@
     "authors": [
         {
             "name": "Navarr Barnier",
-            "email": "me@navarr.me"
+            "email": "me@navarr.me",
+            "homepage": "http://tech.navarr.me/",
+            "role": "Developer"
         }
     ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "license": "MIT",
     "require-dev": {
-        "symfony/class-loader": "2.2.x-dev"
+        "symfony/class-loader": "2.2.x-dev",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Navarr\\Socket\\": "src/"
+        }
     }
 }

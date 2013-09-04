@@ -13,7 +13,8 @@ class SocketException extends \Exception
         } elseif (is_resource($message)) {
             $errno = socket_last_error($message);
         } else {
-            return parent::__construct((string) $message);
+            parent::__construct((string)$message);
+            return;
         }
 
         $error = socket_strerror($errno);

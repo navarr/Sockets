@@ -26,7 +26,7 @@ class Socket
     protected function __construct($resource)
     {
         $this->resource = $resource;
-        self::$map[(string) $resource] = $this;
+        self::$map[(string)$resource] = $this;
     }
 
     /**
@@ -45,7 +45,7 @@ class Socket
      */
     public function __toString()
     {
-        return (string) $this->resource;
+        return (string)$this->resource;
     }
 
     /**
@@ -89,7 +89,7 @@ class Socket
      */
     public function close()
     {
-        unset(self::$map[(string) $this->resource]);
+        unset(self::$map[(string)$this->resource]);
         @socket_close($this->resource);
     }
 
@@ -143,9 +143,9 @@ class Socket
             throw new SocketException();
         }
 
-        $socket           = new self($return);
-        $socket->domain   = $domain;
-        $socket->type     = $type;
+        $socket = new self($return);
+        $socket->domain = $domain;
+        $socket->type = $type;
         $socket->protocol = $protocol;
 
         return $socket;
@@ -165,7 +165,7 @@ class Socket
             throw new SocketException();
         }
 
-        $socket         = new self($return);
+        $socket = new self($return);
         $socket->domain = AF_INET;
 
         return $socket;
@@ -180,7 +180,7 @@ class Socket
      */
     public static function createPair($domain, $type, $protocol)
     {
-        $array  = array();
+        $array = array();
         $return = @socket_create_pair($domain, $type, $protocol, $array);
 
         if ($return === false) {
@@ -190,8 +190,8 @@ class Socket
         $sockets = self::constructFromResources($array);
 
         foreach ($sockets as $socket) {
-            $socket->domain   = $domain;
-            $socket->type     = $type;
+            $socket->domain = $domain;
+            $socket->type = $type;
             $socket->protocol = $protocol;
         }
 
@@ -263,7 +263,7 @@ class Socket
         $return = @socket_import_stream($stream);
 
         if ($return === false) {
-            throw new SocketException($this->resource);
+            throw new SocketException($stream);
         }
 
         return new self($return);
@@ -321,6 +321,8 @@ class Socket
     }
 
     /**
+     * TODO Make this less crazy - but how?
+     *
      * @param Socket[] &$read
      * @param Socket[] &$write
      * @param Socket[] &$except
@@ -336,8 +338,8 @@ class Socket
         $timeoutSeconds,
         $timeoutMilliseconds = 0
     ) {
-        $readSockets   = null;
-        $writeSockets  = null;
+        $readSockets = null;
+        $writeSockets = null;
         $exceptSockets = null;
 
         if ($read !== null) {
@@ -371,23 +373,23 @@ class Socket
             throw new SocketException();
         }
 
-        $read   = array();
-        $write  = array();
+        $read = array();
+        $write = array();
         $except = array();
 
         if ($readSockets) {
             foreach ($readSockets as $rawSocket) {
-                $read[] = self::$map[(string) $rawSocket];
+                $read[] = self::$map[(string)$rawSocket];
             }
         }
         if ($writeSockets) {
             foreach ($writeSockets as $rawSocket) {
-                $write[] = self::$map[(string) $rawSocket];
+                $write[] = self::$map[(string)$rawSocket];
             }
         }
         if ($exceptSockets) {
             foreach ($exceptSockets as $rawSocket) {
-                $except[] = self::$map[(string) $rawSocket];
+                $except[] = self::$map[(string)$rawSocket];
             }
         }
 
@@ -411,7 +413,7 @@ class Socket
             $return = @socket_write($this->resource, $buffer, $length);
 
             if (false !== $return && $return < $length) {
-                $buffer  = substr($buffer, $return);
+                $buffer = substr($buffer, $return);
                 $length -= $return;
 
             } else {

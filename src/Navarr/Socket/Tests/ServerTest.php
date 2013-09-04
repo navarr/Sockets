@@ -38,6 +38,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param Server $server
      * @depends testAddingSingleHookWorksProperly
      */
     public function testAddingMultipleHooksWorksProperly($server)
@@ -68,6 +69,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param Server $server
      * @depends testAddingMultipleHooksWorksProperly
      */
     public function testAddingSameHookMultipleTimesWorksProperly($server)
