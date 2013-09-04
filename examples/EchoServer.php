@@ -16,18 +16,18 @@ class EchoServer extends Server
 
     public function onConnect(Server $server, Socket $client, $message)
     {
-        echo 'Connection Established',"\n";
+        echo 'Connection Established', "\n";
     }
 
     public function onInput(Server $server, Socket $client, $message)
     {
-        echo 'Received "',$message,'"',"\n";
+        echo 'Received "', $message, '"', "\n";
         $client->write($message, strlen($message));
     }
 
     public function onDisconnect(Server $server, Socket $client, $message)
     {
-        echo 'Disconnection',"\n";
+        echo 'Disconnection', "\n";
     }
 }
 
