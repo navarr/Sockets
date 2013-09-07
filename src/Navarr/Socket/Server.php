@@ -141,6 +141,7 @@ class Server
                 // This only happens when a hook tells the server to shut itself down.
                 return false;
             }
+            unset($socket);
         }
 
         // Check for input from each client
@@ -158,7 +159,13 @@ class Server
                     return false;
                 }
             }
+            unset($input);
         }
+
+        // Unset the variables we were holding on to
+        unset($read);
+        unset($write);
+        unset($except);
 
         // Tells self::run to Continue the Loop
         return true;
@@ -191,10 +198,13 @@ class Server
 
         $this->clients[$clientIndex]->close();
         unset($this->clients[$clientIndex]);
+        unset($client);
 
         if ($return === self::RETURN_HALT_SERVER) {
             return false;
         }
+
+        unset($return);
 
         return true;
     }
@@ -218,6 +228,7 @@ class Server
                 if ($continue === self::RETURN_HALT_SERVER) {
                     return false;
                 }
+                unset($continue);
             }
         }
         return true;
@@ -239,6 +250,7 @@ class Server
             if ($k !== false) {
                 return;
             }
+            unset($k);
         }
 
         $this->hooks[$command][] = $callable;
@@ -258,6 +270,7 @@ class Server
 
             $hook = array_search($callable, $this->hooks[$command]);
             unset($this->hooks[$command][$hook]);
+            unset($hook);
         }
     }
 
