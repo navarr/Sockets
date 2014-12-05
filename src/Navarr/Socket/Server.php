@@ -174,7 +174,7 @@ class Server
     /**
      * Overrideable Read Functionality
      * @param Socket $client
-     * @return bool|string
+     * @return string
      */
     protected function read(Socket $client)
     {

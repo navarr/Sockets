@@ -57,6 +57,9 @@ class WebClient
         $this->socket = $client;
     }
 
+    /**
+     * @param string $message
+     */
     public function dispatch($message)
     {
         echo trim($message), "\n";
