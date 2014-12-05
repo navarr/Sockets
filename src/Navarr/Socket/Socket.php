@@ -66,7 +66,7 @@ class Socket
     }
 
     /**
-     * @param $address
+     * @param string $address
      * @param int $port
      * @return bool
      * @throws Exception\SocketException
@@ -129,9 +129,9 @@ class Socket
     /**
      * Create a socket
      *
-     * @param $domain
-     * @param $type
-     * @param $protocol
+     * @param integer $domain
+     * @param integer $type
+     * @param integer $protocol
      * @return Socket
      * @throws Exception\SocketException
      */
@@ -233,8 +233,8 @@ class Socket
     }
 
     /**
-     * @param $address
-     * @param $port
+     * @param string $address
+     * @param integer $port
      * @return bool
      * @throws Exception\SocketException
      */
@@ -328,6 +328,7 @@ class Socket
      * @param Socket[] &$except
      * @param integer $timeoutSeconds
      * @param integer $timeoutMilliseconds
+     * @param Socket[] $read
      * @return integer
      * @throws SocketException
      */
