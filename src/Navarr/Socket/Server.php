@@ -200,7 +200,7 @@ class Server
         unset($this->clients[$clientIndex]);
         unset($client);
 
-        if ($return === self::RETURN_HALT_SERVER) {
+        if ($return === false) {
             return false;
         }
 
