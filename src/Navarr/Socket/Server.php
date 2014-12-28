@@ -185,7 +185,7 @@ class Server
      * Disconnect the supplied Client Socket
      * @param Socket $client
      * @param string $message Disconnection Message.  Could be used to trigger a disconnect with a status code
-     * @return bool Whether or not to shutdown the server
+     * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
     public function disconnect(Socket $client, $message = '')
     {
@@ -214,7 +214,7 @@ class Server
      * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT)
      * @param Socket $client
      * @param string $input Message Sent along with the Trigger
-     * @return bool Whether or not to shutdown the server
+     * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
     protected function triggerHooks($command, Socket $client, $input = null)
     {
