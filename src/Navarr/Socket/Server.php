@@ -14,13 +14,20 @@ class Server
      * IP Address
      * @var string
      */
-    protected $ip;
+    protected $address;
 
     /**
      * Port Number
      * @var int
      */
     protected $port;
+
+    /**
+     * Domain
+     * @see http://php.net/manual/en/function.socket-create.php
+     * @var int One of AF_INET, AF_INET6, AF_UNIX
+     */
+    protected $domain;
 
     /**
      * The Master Socket
@@ -80,23 +87,29 @@ class Server
 
     /**
      * Create an Instance of a Server rearing to go
-     * @param string $ip
+     *
+     * @param string $address An IPv4, IPv6, or Unix socket address
      * @param int $port
      */
-    public function __construct($ip, $port = 0)
+    public function __construct($address, $port = 0)
     {
         set_time_limit(0);
-        $this->ip = $ip;
+        $this->address = $address;
         $this->port = $port;
+        switch (true) {
+            case filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4):
+                $this->domain = AF_INET;
+                break;
+            case filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6):
+                $this->domain = AF_INET6;
+                break;
+            default:
+                $this->domain = AF_UNIX;
+        }
 
-        if (filter_var($ip, FILTER_VALIDATE_IP))
-            $domain = AF_INET;
-        else
-            $domain = AF_UNIX;
-
-        $this->masterSocket = Socket::create($domain, SOCK_STREAM, 0);
-        $this->masterSocket->bind($this->ip, $this->port);
-        $this->masterSocket->getSockName($this->ip, $this->port);
+        $this->masterSocket = Socket::create($this->domain, SOCK_STREAM, 0);
+        $this->masterSocket->bind($this->address, $this->port);
+        $this->masterSocket->getSockName($this->address, $this->port);
         $this->masterSocket->listen();
     }
 
