@@ -83,13 +83,18 @@ class Server
      * @param string $ip
      * @param int $port
      */
-    public function __construct($ip, $port)
+    public function __construct($ip, $port = 0)
     {
         set_time_limit(0);
         $this->ip = $ip;
         $this->port = $port;
 
-        $this->masterSocket = Socket::create(AF_INET, SOCK_STREAM, 0);
+        if (filter_var($ip, FILTER_VALIDATE_IP))
+            $domain = AF_INET;
+        else
+            $domain = AF_UNIX;
+
+        $this->masterSocket = Socket::create($domain, SOCK_STREAM, 0);
         $this->masterSocket->bind($this->ip, $this->port);
         $this->masterSocket->getSockName($this->ip, $this->port);
         $this->masterSocket->listen();
