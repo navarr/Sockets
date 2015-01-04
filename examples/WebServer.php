@@ -1,5 +1,8 @@
 <?php
 
+// run composer install in top directory
+require_once('../vendor/autoload.php');
+
 use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
 
