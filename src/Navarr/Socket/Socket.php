@@ -430,6 +430,40 @@ class Socket
     }
 
     /**
+     * Sends data to a connected socket
+     * @param $buffer
+     * @param int $flags
+     * @param int $length
+     * @return int
+     * @throws Exception\SocketException
+     */
+    public function send($buffer, $flags = 0, $length = null)
+    {
+        if (null === $length) {
+            $length = strlen($buffer);
+        }
+
+        // make sure everything is written
+        do {
+            $return = @socket_send($this->resource, $buffer, $length, $flags);
+
+            if (false !== $return && $return < $length) {
+                $buffer = substr($buffer, $return);
+                $length -= $return;
+
+            } else {
+                break;
+            }
+        } while (true);
+
+        if ($return === false) {
+            throw new SocketException($this->resource);
+        }
+
+        return $return;
+    }
+
+    /**
      * Set the socket to blocking / non blocking.
      *
      * @param boolean
