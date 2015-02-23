@@ -156,7 +156,7 @@ class Server
     protected function loopOnce()
     {
         // Get all the Sockets we should be reading from
-        $read = array_merge(array( $this->masterSocket ), $this->clients);
+        $read = array_merge(array($this->masterSocket), $this->clients);
 
         // Set up a block call to socket_select
         $write  = null;
@@ -171,7 +171,7 @@ class Server
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
-            unset( $read[array_search($this->masterSocket, $read)] );
+            unset($read[array_search($this->masterSocket, $read)]);
             $socket          = $this->masterSocket->accept();
             $this->clients[] = $socket;
 
@@ -179,7 +179,7 @@ class Server
                 // This only happens when a hook tells the server to shut itself down.
                 return false;
             }
-            unset( $socket );
+            unset($socket);
         }
 
         // Check for input from each client
@@ -197,13 +197,13 @@ class Server
                     return false;
                 }
             }
-            unset( $input );
+            unset($input);
         }
 
         // Unset the variables we were holding on to
-        unset( $read );
-        unset( $write );
-        unset( $except );
+        unset($read);
+        unset($write);
+        unset($except);
 
         // Tells self::run to Continue the Loop
         return true;
@@ -239,14 +239,14 @@ class Server
         );
 
         $this->clients[$clientIndex]->close();
-        unset( $this->clients[$clientIndex] );
-        unset( $client );
+        unset($this->clients[$clientIndex]);
+        unset($client);
 
         if ($return === false) {
             return false;
         }
 
-        unset( $return );
+        unset($return);
 
         return true;
     }
@@ -262,7 +262,7 @@ class Server
      */
     protected function triggerHooks($command, Socket $client, $input = null)
     {
-        if (isset( $this->hooks[$command] )) {
+        if (isset($this->hooks[$command])) {
             foreach ($this->hooks[$command] as $callable) {
                 $continue = call_user_func($callable, $this, $client, $input);
 
@@ -272,9 +272,10 @@ class Server
                 if ($continue === self::RETURN_HALT_SERVER) {
                     return false;
                 }
-                unset( $continue );
+                unset($continue);
             }
         }
+
         return true;
     }
 
@@ -289,14 +290,14 @@ class Server
      */
     public function addHook($command, $callable)
     {
-        if (!isset( $this->hooks[$command] )) {
+        if (!isset($this->hooks[$command])) {
             $this->hooks[$command] = array();
         } else {
             $k = array_search($callable, $this->hooks[$command]);
             if ($k !== false) {
                 return;
             }
-            unset( $k );
+            unset($k);
         }
 
         $this->hooks[$command][] = $callable;
@@ -312,13 +313,13 @@ class Server
      */
     public function removeHook($command, $callable)
     {
-        if (isset( $this->hooks[$command] ) &&
+        if (isset($this->hooks[$command]) &&
             array_search($callable, $this->hooks[$command]) !== false
         ) {
 
             $hook = array_search($callable, $this->hooks[$command]);
-            unset( $this->hooks[$command][$hook] );
-            unset( $hook );
+            unset($this->hooks[$command][$hook]);
+            unset($hook);
         }
     }
 

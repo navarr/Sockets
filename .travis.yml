@@ -7,5 +7,5 @@ before_script:
   - composer require --dev phpunit/phpunit 3.7.18
   - wget https://scrutinizer-ci.com/ocular.phar
 script:
-  - phpunit --bootstrap=bootstrap.php --coverage-clover=coverage.clover --coverage-text="php://stdout" --configuration="phpunit.xml" src/Navarr/Socket/Tests
+  - vendor/bin/phpunit --coverage-clover=coverage.clover --configuration="phpunit.xml"
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover

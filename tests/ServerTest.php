@@ -1,14 +1,13 @@
 <?php
 namespace Navarr\Socket\Test;
 
-use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
 
 class ServerTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddingSingleHookWorksProperly()
     {
-        $server = new Server('127.0.0.1', 9000);
+        $server        = new Server('127.0.0.1', 9000);
         $exampleReturn = '__NAVARR_SOCKET_TEST_EXAMPLE_RETURN__';
         $server->addHook(
             Server::HOOK_CONNECT,
@@ -17,7 +16,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             }
         );
 
-        $serverClass = new \ReflectionClass($server);
+        $serverClass   = new \ReflectionClass($server);
         $hooksProperty = $serverClass->getProperty('hooks');
         $hooksProperty->setAccessible(true);
 
@@ -39,7 +38,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Server $server
+     *
      * @depends testAddingSingleHookWorksProperly
+     * @return Server
      */
     public function testAddingMultipleHooksWorksProperly($server)
     {
@@ -50,7 +51,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             }
         );
 
-        $serverClass = new \ReflectionClass($server);
+        $serverClass   = new \ReflectionClass($server);
         $hooksProperty = $serverClass->getProperty('hooks');
         $hooksProperty->setAccessible(true);
 
@@ -70,6 +71,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param Server $server
+     *
      * @depends testAddingMultipleHooksWorksProperly
      */
     public function testAddingSameHookMultipleTimesWorksProperly($server)
@@ -80,7 +82,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $server->addHook(Server::HOOK_CONNECT, $callable);
         $server->addHook(Server::HOOK_CONNECT, $callable);
 
-        $serverClass = new \ReflectionClass($server);
+        $serverClass   = new \ReflectionClass($server);
         $hooksProperty = $serverClass->getProperty('hooks');
         $hooksProperty->setAccessible(true);
 

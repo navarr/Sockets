@@ -1,10 +1,10 @@
 <?php
 
 // run composer install in top directory
-require_once('../vendor/autoload.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
-use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
+use Navarr\Socket\Socket;
 
 class WebServer extends Server
 {
@@ -24,7 +24,7 @@ class WebServer extends Server
     public function onConnect(Server $server, Socket $client, $message)
     {
         echo "Connection\n";
-        $this->clientMap[(string)$client] = new WebClient($server, $client);
+        $this->clientMap[(string) $client] = new WebClient($server, $client);
     }
 
     public function onInput(Server $server, Socket $client, $message)
@@ -32,14 +32,14 @@ class WebServer extends Server
         $messages = explode("\n", $message);
         foreach ($messages as $message) {
             $message .= "\n";
-            $this->clientMap[(string)$client]->dispatch($message);
+            $this->clientMap[(string) $client]->dispatch($message);
         }
     }
 
     public function onDisconnect(Server $server, Socket $client, $message)
     {
         echo "Disconnect\n";
-        unset($this->clientMap[(string)$client]);
+        unset($this->clientMap[(string) $client]);
     }
 }
 
@@ -68,17 +68,18 @@ class WebClient
         echo trim($message), "\n";
         $message = trim($message);
         if ($this->firstLine === null) {
-            $tokens = explode(" ", $message, 3);
-            $this->verb = $tokens[0];
+            $tokens         = explode(" ", $message, 3);
+            $this->verb     = $tokens[0];
             $this->resource = $tokens[1];
             $this->protocol = $tokens[2];
 
             $this->firstLine = $message;
-            $this->lastLine = $message;
+            $this->lastLine  = $message;
+
             return;
         }
         if ($message !== '') {
-            $tokens = explode(": ", $message, 2);
+            $tokens                    = explode(": ", $message, 2);
             $this->headers[$tokens[0]] = $tokens[1];
         }
         if ($this->lastLine === '' && $message === '') {
@@ -86,7 +87,7 @@ class WebClient
             $this->writeLine('Content-Type: text/plain');
             $this->writeLine();
 
-            $url = $this->headers['Host'].$this->resource;
+            $url = $this->headers['Host'] . $this->resource;
             $this->writeLine(
                 "You requested {$url} using verb {$this->verb} over {$this->protocol}"
             );

@@ -3,7 +3,6 @@
 namespace Navarr\Socket\Test;
 
 use Navarr\Socket\Socket;
-use Navarr\Socket\Exception\SocketException;
 
 class SocketTest extends \PHPUnit_Framework_TestCase
 {
