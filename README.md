@@ -1,4 +1,12 @@
-# Sockets [![Build Status](https://travis-ci.org/navarr/Sockets.png)](https://travis-ci.org/navarr/Sockets)
+# Sockets 
+
+[![Build Status](https://scrutinizer-ci.com/g/navarr/Sockets/badges/build.png?b=master)](https://travis-ci.org/navarr/Sockets)
+[![Scrutinizer](https://scrutinizer-ci.com/g/navarr/Sockets/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
+[![Code Coverage](https://scrutinizer-ci.com/g/navarr/Sockets/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
+[![Latest Stable Version](https://poser.pugx.org/navarr/sockets/v/stable.svg)](https://packagist.org/packages/navarr/sockets)
+[![Total Downloads](https://poser.pugx.org/navarr/sockets/downloads.svg)](https://packagist.org/packages/navarr/sockets) 
+[![Latest Unstable Version](https://poser.pugx.org/navarr/sockets/v/unstable.svg)](https://packagist.org/packages/navarr/sockets) 
+[![License](https://poser.pugx.org/navarr/sockets/license.svg)](https://packagist.org/packages/navarr/sockets)
 
 Sockets is a PHP Library intent on making working with PHP Sockets easier, including the creation and management of a Socket Server.
 
