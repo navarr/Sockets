@@ -1,10 +1,10 @@
 <?php
 
 // run composer install in top directory
-require_once('../vendor/autoload.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
-use Navarr\Socket\Socket;
 use Navarr\Socket\Server;
+use Navarr\Socket\Socket;
 
 class EchoServer extends Server
 {

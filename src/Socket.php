@@ -21,12 +21,13 @@ class Socket
 
     /**
      * Sets up the Socket Resource
+     *
      * @param resource $resource
      */
     protected function __construct($resource)
     {
-        $this->resource = $resource;
-        self::$map[(string)$resource] = $this;
+        $this->resource                = $resource;
+        self::$map[(string) $resource] = $this;
     }
 
     /**
@@ -45,7 +46,7 @@ class Socket
      */
     public function __toString()
     {
-        return (string)$this->resource;
+        return (string) $this->resource;
     }
 
     /**
@@ -68,6 +69,7 @@ class Socket
     /**
      * @param string $address
      * @param int $port
+     *
      * @return bool
      * @throws Exception\SocketException
      */
@@ -89,7 +91,7 @@ class Socket
      */
     public function close()
     {
-        unset(self::$map[(string)$this->resource]);
+        unset(self::$map[(string) $this->resource]);
         @socket_close($this->resource);
     }
 
@@ -98,6 +100,7 @@ class Socket
      *
      * @param $address
      * @param int $port
+     *
      * @return bool
      * @throws Exception\SocketException
      */
@@ -108,11 +111,13 @@ class Socket
         if ($return === false) {
             throw new SocketException($this->resource);
         }
+
         return true;
     }
 
     /**
      * @param array $resources
+     *
      * @return Socket[]
      */
     protected static function constructFromResources(array $resources)
@@ -132,6 +137,7 @@ class Socket
      * @param integer $domain
      * @param integer $type
      * @param integer $protocol
+     *
      * @return Socket
      * @throws Exception\SocketException
      */
@@ -143,9 +149,9 @@ class Socket
             throw new SocketException();
         }
 
-        $socket = new self($return);
-        $socket->domain = $domain;
-        $socket->type = $type;
+        $socket           = new self($return);
+        $socket->domain   = $domain;
+        $socket->type     = $type;
         $socket->protocol = $protocol;
 
         return $socket;
@@ -154,6 +160,7 @@ class Socket
     /**
      * @param $port
      * @param int $backlog
+     *
      * @return Socket
      * @throws Exception\SocketException
      */
@@ -165,7 +172,7 @@ class Socket
             throw new SocketException();
         }
 
-        $socket = new self($return);
+        $socket         = new self($return);
         $socket->domain = AF_INET;
 
         return $socket;
@@ -175,12 +182,13 @@ class Socket
      * @param $domain
      * @param $type
      * @param $protocol
+     *
      * @return Socket[]
      * @throws Exception\SocketException
      */
     public static function createPair($domain, $type, $protocol)
     {
-        $array = array();
+        $array  = array();
         $return = @socket_create_pair($domain, $type, $protocol, $array);
 
         if ($return === false) {
@@ -190,8 +198,8 @@ class Socket
         $sockets = self::constructFromResources($array);
 
         foreach ($sockets as $socket) {
-            $socket->domain = $domain;
-            $socket->type = $type;
+            $socket->domain   = $domain;
+            $socket->type     = $type;
             $socket->protocol = $protocol;
         }
 
@@ -201,6 +209,7 @@ class Socket
     /**
      * @param $level
      * @param $optname
+     *
      * @return mixed
      * @throws Exception\SocketException
      */
@@ -218,6 +227,7 @@ class Socket
     /**
      * @param $address
      * @param $port
+     *
      * @return bool
      * @throws Exception\SocketException
      */
@@ -235,6 +245,7 @@ class Socket
     /**
      * @param string $address
      * @param integer $port
+     *
      * @return bool
      * @throws Exception\SocketException
      */
@@ -255,6 +266,7 @@ class Socket
 
     /**
      * @param $stream
+     *
      * @return Socket
      * @throws Exception\SocketException
      */
@@ -271,6 +283,7 @@ class Socket
 
     /**
      * @param int $backlog
+     *
      * @return bool
      * @throws Exception\SocketException
      */
@@ -288,6 +301,7 @@ class Socket
     /**
      * @param int $length
      * @param int $type
+     *
      * @return string
      * @throws Exception\SocketException
      */
@@ -306,6 +320,7 @@ class Socket
      * @param $buffer
      * @param int $length
      * @param int $flags
+     *
      * @return int
      * @throws Exception\SocketException
      */
@@ -329,6 +344,7 @@ class Socket
      * @param integer $timeoutSeconds
      * @param integer $timeoutMilliseconds
      * @param Socket[] $read
+     *
      * @return integer
      * @throws SocketException
      */
@@ -339,8 +355,8 @@ class Socket
         $timeoutSeconds,
         $timeoutMilliseconds = 0
     ) {
-        $readSockets = null;
-        $writeSockets = null;
+        $readSockets   = null;
+        $writeSockets  = null;
         $exceptSockets = null;
 
         if ($read !== null) {
@@ -374,23 +390,23 @@ class Socket
             throw new SocketException();
         }
 
-        $read = array();
-        $write = array();
+        $read   = array();
+        $write  = array();
         $except = array();
 
         if ($readSockets) {
             foreach ($readSockets as $rawSocket) {
-                $read[] = self::$map[(string)$rawSocket];
+                $read[] = self::$map[(string) $rawSocket];
             }
         }
         if ($writeSockets) {
             foreach ($writeSockets as $rawSocket) {
-                $write[] = self::$map[(string)$rawSocket];
+                $write[] = self::$map[(string) $rawSocket];
             }
         }
         if ($exceptSockets) {
             foreach ($exceptSockets as $rawSocket) {
-                $except[] = self::$map[(string)$rawSocket];
+                $except[] = self::$map[(string) $rawSocket];
             }
         }
 
@@ -400,6 +416,7 @@ class Socket
     /**
      * @param $buffer
      * @param int $length
+     *
      * @return int
      * @throws Exception\SocketException
      */
@@ -431,9 +448,11 @@ class Socket
 
     /**
      * Sends data to a connected socket
+     *
      * @param $buffer
      * @param int $flags
      * @param int $length
+     *
      * @return int
      * @throws Exception\SocketException
      */
@@ -467,6 +486,7 @@ class Socket
      * Set the socket to blocking / non blocking.
      *
      * @param boolean
+     *
      * @return void
      */
     public function setBlocking($bool)
