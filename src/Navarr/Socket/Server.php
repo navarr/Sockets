@@ -23,6 +23,12 @@ class Server
     protected $port;
 
     /**
+     * Seconds to wait on a socket before timing out
+     * @var int|null
+     */
+    protected $timeout = null;
+
+    /**
      * Domain
      * @see http://php.net/manual/en/function.socket-create.php
      * @var int One of AF_INET, AF_INET6, AF_UNIX
@@ -95,12 +101,15 @@ class Server
      *
      * @param string $address An IPv4, IPv6, or Unix socket address
      * @param int $port
+     * @param int $timeout Seconds to wait on a socket before timing it out
      */
-    public function __construct($address, $port = 0)
+    public function __construct($address, $port = 0, $timeout = null)
     {
         set_time_limit(0);
         $this->address = $address;
-        $this->port = $port;
+        $this->port    = $port;
+        $this->timeout = $timeout;
+
         switch (true) {
             case filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4):
                 $this->domain = AF_INET;
@@ -129,10 +138,10 @@ class Server
      * @return void
      * @throws \Navarr\Socket\Exception\SocketException
      */
-    public function run($timeoutSeconds = null)
+    public function run()
     {
         do {
-            $test = $this->loopOnce($timeoutSeconds);
+            $test = $this->loopOnce();
 
         } while ($test);
 
@@ -144,33 +153,33 @@ class Server
      * @return bool Whether or not to shutdown the server
      * @throws \Navarr\Socket\Exception\SocketException
      */
-    protected function loopOnce($timeoutSeconds = null)
+    protected function loopOnce()
     {
         // Get all the Sockets we should be reading from
-        $read = array_merge(array($this->masterSocket), $this->clients);
+        $read = array_merge(array( $this->masterSocket ), $this->clients);
 
         // Set up a block call to socket_select
-        $write = null;
+        $write  = null;
         $except = null;
-        $ret = Socket::select($read, $write, $except, $timeoutSeconds);
-        if ($timeoutSeconds != null && $ret == 0) {
-          if ($this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false) {
-              // This only happens when a hook tells the server to shut itself down.
-              return false;
-          }
+        $ret    = Socket::select($read, $write, $except, $this->timeout);
+        if ($this->timeout != null && $ret == 0) {
+            if ($this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false) {
+                // This only happens when a hook tells the server to shut itself down.
+                return false;
+            }
         }
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
-            unset($read[array_search($this->masterSocket, $read)]);
-            $socket = $this->masterSocket->accept();
+            unset( $read[array_search($this->masterSocket, $read)] );
+            $socket          = $this->masterSocket->accept();
             $this->clients[] = $socket;
 
             if ($this->triggerHooks(self::HOOK_CONNECT, $socket) === false) {
                 // This only happens when a hook tells the server to shut itself down.
                 return false;
             }
-            unset($socket);
+            unset( $socket );
         }
 
         // Check for input from each client
@@ -188,13 +197,13 @@ class Server
                     return false;
                 }
             }
-            unset($input);
+            unset( $input );
         }
 
         // Unset the variables we were holding on to
-        unset($read);
-        unset($write);
-        unset($except);
+        unset( $read );
+        unset( $write );
+        unset( $except );
 
         // Tells self::run to Continue the Loop
         return true;
@@ -202,7 +211,9 @@ class Server
 
     /**
      * Overrideable Read Functionality
+     *
      * @param Socket $client
+     *
      * @return string
      */
     protected function read(Socket $client)
@@ -212,42 +223,46 @@ class Server
 
     /**
      * Disconnect the supplied Client Socket
+     *
      * @param Socket $client
      * @param string $message Disconnection Message.  Could be used to trigger a disconnect with a status code
+     *
      * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
     public function disconnect(Socket $client, $message = '')
     {
         $clientIndex = array_search($client, $this->clients);
-        $return = $this->triggerHooks(
+        $return      = $this->triggerHooks(
             self::HOOK_DISCONNECT,
             $this->clients[$clientIndex],
             $message
         );
 
         $this->clients[$clientIndex]->close();
-        unset($this->clients[$clientIndex]);
-        unset($client);
+        unset( $this->clients[$clientIndex] );
+        unset( $client );
 
         if ($return === false) {
             return false;
         }
 
-        unset($return);
+        unset( $return );
 
         return true;
     }
 
     /**
      * Triggers the hooks for the supplied command
+     *
      * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT, HOOK_TIMEOUT)
      * @param Socket $client
      * @param string $input Message Sent along with the Trigger
+     *
      * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
     protected function triggerHooks($command, Socket $client, $input = null)
     {
-        if (isset($this->hooks[$command])) {
+        if (isset( $this->hooks[$command] )) {
             foreach ($this->hooks[$command] as $callable) {
                 $continue = call_user_func($callable, $this, $client, $input);
 
@@ -257,7 +272,7 @@ class Server
                 if ($continue === self::RETURN_HALT_SERVER) {
                     return false;
                 }
-                unset($continue);
+                unset( $continue );
             }
         }
         return true;
@@ -265,21 +280,23 @@ class Server
 
     /**
      * Attach a Listener to a Hook
+     *
      * @param string $command Hook to listen for
      * @param callable $callable A callable with the signature (Server, Socket, string).
      *        Callable should return false if it wishes to stop the server, and true if it wishes to continue.
+     *
      * @return void
      */
     public function addHook($command, $callable)
     {
-        if (!isset($this->hooks[$command])) {
+        if (!isset( $this->hooks[$command] )) {
             $this->hooks[$command] = array();
         } else {
             $k = array_search($callable, $this->hooks[$command]);
             if ($k !== false) {
                 return;
             }
-            unset($k);
+            unset( $k );
         }
 
         $this->hooks[$command][] = $callable;
@@ -287,19 +304,21 @@ class Server
 
     /**
      * Remove the provided Callable from the provided Hook
+     *
      * @param string $command Hook to remove callable from
      * @param callable $callable The callable to be removed
+     *
      * @return void
      */
     public function removeHook($command, $callable)
     {
-        if (isset($this->hooks[$command]) &&
+        if (isset( $this->hooks[$command] ) &&
             array_search($callable, $this->hooks[$command]) !== false
         ) {
 
             $hook = array_search($callable, $this->hooks[$command]);
-            unset($this->hooks[$command][$hook]);
-            unset($hook);
+            unset( $this->hooks[$command][$hook] );
+            unset( $hook );
         }
     }
 
