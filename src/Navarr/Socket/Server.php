@@ -76,6 +76,11 @@ class Server
     const HOOK_DISCONNECT = '__NAVARR_SOCKET_SERVER_DISCONNECT__';
 
     /**
+     * Constant String for Server Timeout
+     */
+    const HOOK_TIMEOUT = '__NAVARR_SOCKET_SERVER_TIMEOUT__';
+
+    /**
      * Return value from a hook callable to tell the server not to run the other hooks
      */
     const RETURN_HALT_HOOK = false;
@@ -124,10 +129,10 @@ class Server
      * @return void
      * @throws \Navarr\Socket\Exception\SocketException
      */
-    public function run()
+    public function run($timeoutSeconds = null)
     {
         do {
-            $test = $this->loopOnce();
+            $test = $this->loopOnce($timeoutSeconds);
 
         } while ($test);
 
@@ -139,7 +144,7 @@ class Server
      * @return bool Whether or not to shutdown the server
      * @throws \Navarr\Socket\Exception\SocketException
      */
-    protected function loopOnce()
+    protected function loopOnce($timeoutSeconds = null)
     {
         // Get all the Sockets we should be reading from
         $read = array_merge(array($this->masterSocket), $this->clients);
@@ -147,7 +152,13 @@ class Server
         // Set up a block call to socket_select
         $write = null;
         $except = null;
-        Socket::select($read, $write, $except, null);
+        $ret = Socket::select($read, $write, $except, $timeoutSeconds);
+        if ($timeoutSeconds != null && $ret == 0) {
+          if ($this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false) {
+              // This only happens when a hook tells the server to shut itself down.
+              return false;
+          }
+        }
 
         // If there is a new connection, add it
         if (in_array($this->masterSocket, $read)) {
@@ -229,7 +240,7 @@ class Server
 
     /**
      * Triggers the hooks for the supplied command
-     * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT)
+     * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT, HOOK_TIMEOUT)
      * @param Socket $client
      * @param string $input Message Sent along with the Trigger
      * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
