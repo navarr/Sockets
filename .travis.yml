@@ -4,10 +4,16 @@ php:
   - 5.5
   - 5.6
   - hhvm
-before_script:
-  - composer selfupdate
-  - composer install
+
+matrix:
+  allow_failures:
+    - php: hhvm
+  
+install:
+  - composer self-update && composer --version
+  - composer install --prefer-dist --dev
   - wget https://scrutinizer-ci.com/ocular.phar
+  
 script:
-  - vendor/bin/phpunit --coverage-clover=coverage.clover --configuration="phpunit.xml"
+  - vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --configuration="phpunit.xml"
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
