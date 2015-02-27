@@ -1,6 +1,6 @@
 # Sockets 
 
-[![Build Status](https://scrutinizer-ci.com/g/navarr/Sockets/badges/build.png?b=master)](https://travis-ci.org/navarr/Sockets)
+[![Build Status](https://travis-ci.org/navarr/Sockets.svg)](https://travis-ci.org/navarr/Sockets)
 [![Scrutinizer](https://scrutinizer-ci.com/g/navarr/Sockets/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
 [![Code Coverage](https://scrutinizer-ci.com/g/navarr/Sockets/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
 [![Latest Stable Version](https://poser.pugx.org/navarr/sockets/v/stable.svg)](https://packagist.org/packages/navarr/sockets)
