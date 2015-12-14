@@ -5,11 +5,9 @@ namespace Navarr\Socket;
 use Navarr\Socket\Exception\SocketException;
 
 /**
- * Class Socket
+ * Class Socket.
  *
  * A simple wrapper for PHP's socket functions
- *
- * @package Navarr\Socket
  */
 class Socket
 {
@@ -17,21 +15,21 @@ class Socket
     protected $domain = null;
     protected $type = null;
     protected $protocol = null;
-    protected static $map = array();
+    protected static $map = [];
 
     /**
-     * Sets up the Socket Resource
+     * Sets up the Socket Resource.
      *
      * @param resource $resource
      */
     protected function __construct($resource)
     {
-        $this->resource                = $resource;
+        $this->resource = $resource;
         self::$map[(string) $resource] = $this;
     }
 
     /**
-     * Cleans up the Socket
+     * Cleans up the Socket.
      */
     public function __destruct()
     {
@@ -50,10 +48,11 @@ class Socket
     }
 
     /**
-     * Accept a connection
+     * Accept a connection.
+     *
+     * @throws Exception\SocketException
      *
      * @return Socket
-     * @throws Exception\SocketException
      */
     public function accept()
     {
@@ -68,10 +67,11 @@ class Socket
 
     /**
      * @param string $address
-     * @param int $port
+     * @param int    $port
+     *
+     * @throws Exception\SocketException
      *
      * @return bool
-     * @throws Exception\SocketException
      */
     public function bind($address, $port = 0)
     {
@@ -96,13 +96,14 @@ class Socket
     }
 
     /**
-     * Connect to a socket
+     * Connect to a socket.
      *
      * @param $address
      * @param int $port
      *
-     * @return bool
      * @throws Exception\SocketException
+     *
+     * @return bool
      */
     public function connect($address, $port = 0)
     {
@@ -122,7 +123,7 @@ class Socket
      */
     protected static function constructFromResources(array $resources)
     {
-        $sockets = array();
+        $sockets = [];
 
         foreach ($resources as $resource) {
             $sockets[] = new self($resource);
@@ -132,14 +133,15 @@ class Socket
     }
 
     /**
-     * Create a socket
+     * Create a socket.
      *
-     * @param integer $domain
-     * @param integer $type
-     * @param integer $protocol
+     * @param int $domain
+     * @param int $type
+     * @param int $protocol
+     *
+     * @throws Exception\SocketException
      *
      * @return Socket
-     * @throws Exception\SocketException
      */
     public static function create($domain, $type, $protocol)
     {
@@ -149,9 +151,9 @@ class Socket
             throw new SocketException();
         }
 
-        $socket           = new self($return);
-        $socket->domain   = $domain;
-        $socket->type     = $type;
+        $socket = new self($return);
+        $socket->domain = $domain;
+        $socket->type = $type;
         $socket->protocol = $protocol;
 
         return $socket;
@@ -161,8 +163,9 @@ class Socket
      * @param $port
      * @param int $backlog
      *
-     * @return Socket
      * @throws Exception\SocketException
+     *
+     * @return Socket
      */
     public static function createListen($port, $backlog = 128)
     {
@@ -172,7 +175,7 @@ class Socket
             throw new SocketException();
         }
 
-        $socket         = new self($return);
+        $socket = new self($return);
         $socket->domain = AF_INET;
 
         return $socket;
@@ -183,12 +186,13 @@ class Socket
      * @param $type
      * @param $protocol
      *
-     * @return Socket[]
      * @throws Exception\SocketException
+     *
+     * @return Socket[]
      */
     public static function createPair($domain, $type, $protocol)
     {
-        $array  = array();
+        $array = [];
         $return = @socket_create_pair($domain, $type, $protocol, $array);
 
         if ($return === false) {
@@ -198,8 +202,8 @@ class Socket
         $sockets = self::constructFromResources($array);
 
         foreach ($sockets as $socket) {
-            $socket->domain   = $domain;
-            $socket->type     = $type;
+            $socket->domain = $domain;
+            $socket->type = $type;
             $socket->protocol = $protocol;
         }
 
@@ -210,8 +214,9 @@ class Socket
      * @param $level
      * @param $optname
      *
-     * @return mixed
      * @throws Exception\SocketException
+     *
+     * @return mixed
      */
     public function getOption($level, $optname)
     {
@@ -228,8 +233,9 @@ class Socket
      * @param $address
      * @param $port
      *
-     * @return bool
      * @throws Exception\SocketException
+     *
+     * @return bool
      */
     public function getPeerName(&$address, &$port)
     {
@@ -244,14 +250,15 @@ class Socket
 
     /**
      * @param string $address
-     * @param integer $port
+     * @param int    $port
+     *
+     * @throws Exception\SocketException
      *
      * @return bool
-     * @throws Exception\SocketException
      */
     public function getSockName(&$address, &$port)
     {
-        if (!in_array($this->domain, array(AF_UNIX, AF_INET, AF_INET6))) {
+        if (!in_array($this->domain, [AF_UNIX, AF_INET, AF_INET6])) {
             return false;
         }
 
@@ -267,8 +274,9 @@ class Socket
     /**
      * @param $stream
      *
-     * @return Socket
      * @throws Exception\SocketException
+     *
+     * @return Socket
      */
     public static function importStream($stream)
     {
@@ -284,8 +292,9 @@ class Socket
     /**
      * @param int $backlog
      *
-     * @return bool
      * @throws Exception\SocketException
+     *
+     * @return bool
      */
     public function listen($backlog = 0)
     {
@@ -302,8 +311,9 @@ class Socket
      * @param int $length
      * @param int $type
      *
-     * @return string
      * @throws Exception\SocketException
+     *
+     * @return string
      */
     public function read($length, $type = PHP_BINARY_READ)
     {
@@ -321,8 +331,9 @@ class Socket
      * @param int $length
      * @param int $flags
      *
-     * @return int
      * @throws Exception\SocketException
+     *
+     * @return int
      */
     public function receive(&$buffer, $length, $flags)
     {
@@ -341,12 +352,13 @@ class Socket
      * @param Socket[] &$read
      * @param Socket[] &$write
      * @param Socket[] &$except
-     * @param integer $timeoutSeconds
-     * @param integer $timeoutMilliseconds
+     * @param int      $timeoutSeconds
+     * @param int      $timeoutMilliseconds
      * @param Socket[] $read
      *
-     * @return integer
      * @throws SocketException
+     *
+     * @return int
      */
     public static function select(
         &$read,
@@ -355,24 +367,24 @@ class Socket
         $timeoutSeconds,
         $timeoutMilliseconds = 0
     ) {
-        $readSockets   = null;
-        $writeSockets  = null;
+        $readSockets = null;
+        $writeSockets = null;
         $exceptSockets = null;
 
         if ($read !== null) {
-            $readSockets = array();
+            $readSockets = [];
             foreach ($read as $socket) {
                 $readSockets[] = $socket->resource;
             }
         }
         if ($write !== null) {
-            $writeSockets = array();
+            $writeSockets = [];
             foreach ($write as $socket) {
                 $writeSockets[] = $socket->resource;
             }
         }
         if ($except !== null) {
-            $exceptSockets = array();
+            $exceptSockets = [];
             foreach ($except as $socket) {
                 $exceptSockets[] = $socket->resource;
             }
@@ -390,9 +402,9 @@ class Socket
             throw new SocketException();
         }
 
-        $read   = array();
-        $write  = array();
-        $except = array();
+        $read = [];
+        $write = [];
+        $except = [];
 
         if ($readSockets) {
             foreach ($readSockets as $rawSocket) {
@@ -417,8 +429,9 @@ class Socket
      * @param $buffer
      * @param int $length
      *
-     * @return int
      * @throws Exception\SocketException
+     *
+     * @return int
      */
     public function write($buffer, $length = null)
     {
@@ -433,7 +446,6 @@ class Socket
             if (false !== $return && $return < $length) {
                 $buffer = substr($buffer, $return);
                 $length -= $return;
-
             } else {
                 break;
             }
@@ -447,14 +459,15 @@ class Socket
     }
 
     /**
-     * Sends data to a connected socket
+     * Sends data to a connected socket.
      *
      * @param $buffer
      * @param int $flags
      * @param int $length
      *
-     * @return int
      * @throws Exception\SocketException
+     *
+     * @return int
      */
     public function send($buffer, $flags = 0, $length = null)
     {
@@ -469,7 +482,6 @@ class Socket
             if (false !== $return && $return < $length) {
                 $buffer = substr($buffer, $return);
                 $length -= $return;
-
             } else {
                 break;
             }
@@ -485,7 +497,7 @@ class Socket
     /**
      * Set the socket to blocking / non blocking.
      *
-     * @param boolean
+     * @param bool
      *
      * @return void
      */

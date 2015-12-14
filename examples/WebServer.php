@@ -1,7 +1,7 @@
 <?php
 
 // run composer install in top directory
-require_once(__DIR__ . '/../vendor/autoload.php');
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Navarr\Socket\Server;
 use Navarr\Socket\Socket;
@@ -15,9 +15,9 @@ class WebServer extends Server
     public function __construct($address = null, $port = 80)
     {
         parent::__construct($address, $port);
-        $this->addHook(Server::HOOK_CONNECT, array($this, 'onConnect'));
-        $this->addHook(Server::HOOK_INPUT, array($this, 'onInput'));
-        $this->addHook(Server::HOOK_DISCONNECT, array($this, 'onDisconnect'));
+        $this->addHook(Server::HOOK_CONNECT, [$this, 'onConnect']);
+        $this->addHook(Server::HOOK_INPUT, [$this, 'onInput']);
+        $this->addHook(Server::HOOK_DISCONNECT, [$this, 'onDisconnect']);
         $this->run();
     }
 
@@ -52,7 +52,7 @@ class WebClient
     protected $resource = null;
     protected $lastLine = null;
     protected $protocol = null;
-    protected $headers = array();
+    protected $headers = [];
 
     public function __construct(Server $server, Socket $client)
     {
@@ -68,18 +68,18 @@ class WebClient
         echo trim($message), "\n";
         $message = trim($message);
         if ($this->firstLine === null) {
-            $tokens         = explode(" ", $message, 3);
-            $this->verb     = $tokens[0];
+            $tokens = explode(' ', $message, 3);
+            $this->verb = $tokens[0];
             $this->resource = $tokens[1];
             $this->protocol = $tokens[2];
 
             $this->firstLine = $message;
-            $this->lastLine  = $message;
+            $this->lastLine = $message;
 
             return;
         }
         if ($message !== '') {
-            $tokens                    = explode(": ", $message, 2);
+            $tokens = explode(': ', $message, 2);
             $this->headers[$tokens[0]] = $tokens[1];
         }
         if ($this->lastLine === '' && $message === '') {
@@ -87,7 +87,7 @@ class WebClient
             $this->writeLine('Content-Type: text/plain');
             $this->writeLine();
 
-            $url = $this->headers['Host'] . $this->resource;
+            $url = $this->headers['Host'].$this->resource;
             $this->writeLine(
                 "You requested {$url} using verb {$this->verb} over {$this->protocol}"
             );
