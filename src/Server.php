@@ -177,7 +177,7 @@ class Server
         $write = null;
         $except = null;
         $ret = Socket::select($read, $write, $except, $this->timeout);
-        if ($this->timeout != null && $ret == 0) {
+        if (!is_null($this->timeout) && $ret == 0) {
             if ($this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false) {
                 // This only happens when a hook tells the server to shut itself down.
                 return false;
