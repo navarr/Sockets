@@ -412,6 +412,7 @@ class Socket
      * Maps an array of {@see Socket}s to an array of socket resources.
      *
      * @param Socket[] $sockets
+     * 
      * @return resource[]
      */
     protected static function mapClassToRawSocket($sockets)
@@ -425,6 +426,7 @@ class Socket
      * Maps an array of socket resources to an array of {@see Socket}s.
      *
      * @param resource[] $sockets
+     *
      * @return Socket[]
      */
     protected static function mapRawSocketToClass($sockets)
