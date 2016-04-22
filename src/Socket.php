@@ -347,8 +347,6 @@ class Socket
     }
 
     /**
-     * TODO Make this less crazy - but how?
-     *
      * @param Socket[] &$read
      * @param Socket[] &$write
      * @param Socket[] &$except
@@ -371,23 +369,14 @@ class Socket
         $writeSockets = null;
         $exceptSockets = null;
 
-        if ($read !== null) {
-            $readSockets = [];
-            foreach ($read as $socket) {
-                $readSockets[] = $socket->resource;
-            }
+        if (!is_null($read)) {
+            $readSockets = self::mapClassToRawSocket($read);
         }
-        if ($write !== null) {
-            $writeSockets = [];
-            foreach ($write as $socket) {
-                $writeSockets[] = $socket->resource;
-            }
+        if (!is_null($write)) {
+            $writeSockets = self::mapClassToRawSocket($write);
         }
-        if ($except !== null) {
-            $exceptSockets = [];
-            foreach ($except as $socket) {
-                $exceptSockets[] = $socket->resource;
-            }
+        if (!is_null($except)) {
+            $exceptSockets = self::mapClassToRawSocket($except);
         }
 
         $return = @socket_select(
@@ -407,22 +396,42 @@ class Socket
         $except = [];
 
         if ($readSockets) {
-            foreach ($readSockets as $rawSocket) {
-                $read[] = self::$map[(string) $rawSocket];
-            }
+            $read = static::mapRawSocketToClass($readSockets);
         }
         if ($writeSockets) {
-            foreach ($writeSockets as $rawSocket) {
-                $write[] = self::$map[(string) $rawSocket];
-            }
+            $write = static::mapRawSocketToClass($writeSockets);
         }
         if ($exceptSockets) {
-            foreach ($exceptSockets as $rawSocket) {
-                $except[] = self::$map[(string) $rawSocket];
-            }
+            $except = static::mapRawSocketToClass($exceptSockets);
         }
 
         return $return;
+    }
+
+    /**
+     * Maps an array of {@see Socket}s to an array of socket resources
+     *
+     * @param Socket[] $sockets
+     * @return resource[]
+     */
+    protected static function mapClassToRawSocket($sockets)
+    {
+        return array_map(function(Socket $socket) {
+            return $socket->resource;
+        }, $sockets);
+    }
+
+    /**
+     * Maps an array of socket resources to an array of {@see Socket}s
+     *
+     * @param resource[] $sockets
+     * @return Socket[]
+     */
+    protected static function mapRawSocketToClass($sockets)
+    {
+        return array_map(function($rawSocket) {
+            return self::$map[(string) $rawSocket];
+        }, $sockets);
     }
 
     /**
