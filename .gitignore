@@ -1,2 +1,2 @@
-.idea/
-atlassian-ide-plugin.xml
+vendor/
+composer.lock
