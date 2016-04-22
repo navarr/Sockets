@@ -11,7 +11,8 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0"
+    "php": "^5.4.0",
+    "ext-sockets": "*"
   },
   "license": "MIT",
   "require-dev": {
@@ -22,5 +23,11 @@
     "psr-4": {
       "Navarr\\Socket\\": "src/"
     }
+  },
+  "scripts": {
+    "test": [
+      "@composer install",
+      "phpunit"
+    ]
   }
 }
