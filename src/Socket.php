@@ -409,27 +409,27 @@ class Socket
     }
 
     /**
-     * Maps an array of {@see Socket}s to an array of socket resources
+     * Maps an array of {@see Socket}s to an array of socket resources.
      *
      * @param Socket[] $sockets
      * @return resource[]
      */
     protected static function mapClassToRawSocket($sockets)
     {
-        return array_map(function(Socket $socket) {
+        return array_map(function (Socket $socket) {
             return $socket->resource;
         }, $sockets);
     }
 
     /**
-     * Maps an array of socket resources to an array of {@see Socket}s
+     * Maps an array of socket resources to an array of {@see Socket}s.
      *
      * @param resource[] $sockets
      * @return Socket[]
      */
     protected static function mapRawSocketToClass($sockets)
     {
-        return array_map(function($rawSocket) {
+        return array_map(function ($rawSocket) {
             return self::$map[(string) $rawSocket];
         }, $sockets);
     }
