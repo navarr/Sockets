@@ -348,5 +348,16 @@ class Server
             $this->disconnect($client);
         }
         $this->masterSocket->close();
+        unset(  $this->hooks,
+                $this->address,
+                $this->port,
+                $this->timeout,
+                $this->domain,
+                $this->masterSocket,
+                $this->maxClients,
+                $this->maxRead,
+                $this->clients,
+                $this->readType
+            );
     }
 }
