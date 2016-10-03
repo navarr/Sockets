@@ -32,9 +32,11 @@ use Navarr\Socket\Server;
 
 class EchoServer extends Server
 {
-    public function __construct($ip = null, $port = 7)
+    const DEFAULT_PORT = 7;
+    
+    public function __construct($ip = null, $port = DEFAULT_PORT)
     {
-        parent::__construct($ip, 7);
+        parent::__construct($ip, $port);
         $this->addHook(Server::HOOK_CONNECT, array($this, 'onConnect'));
         $this->addHook(Server::HOOK_INPUT, array($this, 'onInput'));
         $this->addHook(Server::HOOK_DISCONNECT, array($this, 'onDisconnect'));
