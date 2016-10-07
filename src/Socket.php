@@ -7,20 +7,44 @@ use Navarr\Socket\Exception\SocketException;
 /**
  * Class Socket.
  *
- * A simple wrapper for PHP's socket functions
+ * <p>A simple wrapper for PHP's socket functions.</p>
  */
 class Socket
 {
+    /**
+     * @var resource Will store a reference to the php socket object.
+     */
     protected $resource = null;
+    /**
+     * @var integer Should be set to one of the php predefined constants for Sockets - AF_UNIX, AF_INET, or AF_INET6
+     */
     protected $domain = null;
+    /**
+     * @var integer Should be set to one of the php predefined constants for Sockets - SOCK_STREAM, SOCK_DGRAM, 
+     * SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM
+     */
     protected $type = null;
+    /**
+     * @var integer Should be set to the protocol number to be used. Can use getprotobyname to get the value.
+     * Alternatively, there are two predefined constants for Sockets that could be used - SOL_TCP, SOL_UDP
+     */
     protected $protocol = null;
+    /**
+     * @var array An internal storage of php socket resources and their associated Socket object.
+     */
     protected static $map = [];
 
     /**
-     * Sets up the Socket Resource.
+     * Sets up the Socket Resource and stores it in the local map.
      *
-     * @param resource $resource
+     * <p>This class uses the <a href="https://en.wikipedia.org/wiki/Factory_(object-oriented_programming)">
+     * Factory pattern</a> to create instances. Please use the <code>create</code> method to create new instances
+     * of this class.
+     *
+     * @see Socket::create()
+     *
+     * @param resource $resource The php socket resource. This is just a reference to the socket object created using
+     * the <code>socket_create</code> method.
      */
     protected function __construct($resource)
     {
@@ -29,7 +53,7 @@ class Socket
     }
 
     /**
-     * Cleans up the Socket.
+     * Cleans up the Socket and dereferences the internal resource.
      */
     public function __destruct()
     {
@@ -38,9 +62,17 @@ class Socket
     }
 
     /**
-     * Return the resource name.
+     * Return the php socket resource name. 
      *
-     * @return string
+     * <p>Resources are always converted to strings with the structure "Resource id#1", where 1 is the resource number
+     * assigned to the resource by PHP at runtime. While the exact structure of this string should not be relied on and
+     * is subject to change, it will always be unique for a given resource within the lifetime of the script execution
+     * and won't be reused.</p>
+     *
+     * <p>If the resource object has been dereferrenced (set to <code>null</code>), this will return an empty
+     * string.</p>
+     *
+     * @return string The string representation of the resource or an empty string if the resource was null.
      */
     public function __toString()
     {
@@ -50,9 +82,24 @@ class Socket
     /**
      * Accept a connection.
      *
-     * @throws Exception\SocketException
+     * <p>After the socket socket has been created using <code>create()</code>, bound to a name with
+     * <code>bind()</code>, and told to listen for connections with <code>listen()</code>, this function will accept
+     * incoming connections on that socket. Once a successful connection is made, a new Socket resource is returned,
+     * which may be used for communication. If there are multiple connections queued on the socket, the first will be
+     * used. If there are no pending connections, this will block until a connection becomes present. If socket has
+     * been made non-blocking using <code>setBlocking()</code>, a <code>SocketException</code> will be thrown.</p>
      *
-     * @return Socket
+     * <p>The Socket returned by this method may not be used to accept new connections. The original listening Socket,
+     * however, remains open and may be reused.</p>
+     *
+     * @throws Exception\SocketException If the Socket is set as non-blocking and there are no pending connections.
+     *
+     * @see Socket::create()
+     * @see Socket::bind()
+     * @see Socket::listen()
+     * @see Socket::setBlocking()
+     *
+     * @return Socket A new Socket representation of the accepted socket.
      */
     public function accept()
     {
@@ -66,12 +113,20 @@ class Socket
     }
 
     /**
-     * @param string $address
-     * @param int    $port
+     * Binds a name to a socket.
      *
-     * @throws Exception\SocketException
+     * <p>Binds the name given in address to the php socket resource currently in use. This has to be done before a
+     * connection is established using <code>connect()</code> or <code>listen()</code>.</p>
      *
-     * @return bool
+     * @param string $address <p>If the socket is of the AF_INET family, the address is an IP in dotted-quad
+     * notation (e.g. <code>127.0.0.1</code>).</p> <p>If the socket is of the AF_UNIX family, the address is the path
+     * of the Unix-domain socket (e.g. <code>/tmp/my.sock</code>).</p>
+     * @param int    $port <p>(Optional) The port parameter is only used when binding an AF_INET socket, and designates the port
+     * on which to listen for connections.</p>
+     *
+     * @throws Exception\SocketException If the bind was unsuccessful.
+     *
+     * @return bool <p>Returns <code>true</code> if the bind was successful.</p>
      */
     public function bind($address, $port = 0)
     {
@@ -87,6 +142,8 @@ class Socket
     /**
      * Close the socket.
      *
+     * <p>Closes the php socket resource currently in use and removes the reference to it in the internal map.</p>
+     *
      * @return void
      */
     public function close()
@@ -98,12 +155,23 @@ class Socket
     /**
      * Connect to a socket.
      *
-     * @param $address
-     * @param int $port
+     * <p>Initiate a connection to the address given using the current php socket resource, which must be a valid
+     * socket resource created with <code>create()</code>.
      *
-     * @throws Exception\SocketException
+     * @param string $address <p>The address parameter is either an IPv4 address in dotted-quad notation (e.g.
+     * <code>127.0.0.1</code>) if the socket is AF_INET, a valid IPv6 address (e.g. <code>::1</code>) if IPv6 support
+     * is enabled and the socket is AF_INET6, or the pathname of a Unix domain socket, if the socket family is AF_UNIX.
+     * </p>
+     * @param int $port <p>(Optional) The port parameter is only used and is mandatory when connecting to an AF_INET or
+     * an AF_INET6 socket, and designates the port on the remote host to which a connection should be made.</p>
      *
-     * @return bool
+     * @throws Exception\SocketException If the connect was unsuccessful or if the socket is non-blocking.
+     *
+     * @see Socket::bind()
+     * @see Socket::listen()
+     * @see Socket::create()
+     *
+     * @return bool <p>Returns <code>true</code> if the connect was successful.
      */
     public function connect($address, $port = 0)
     {
