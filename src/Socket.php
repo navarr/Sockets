@@ -193,7 +193,7 @@ class Socket
      */
     protected static function constructFromResources(array $resources)
     {
-        return array_map(function($resource) {
+        return array_map(function ($resource) {
             return new self($resource);
         }, $resources);
     }
