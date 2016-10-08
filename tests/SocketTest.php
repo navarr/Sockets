@@ -39,7 +39,7 @@ class SocketTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Verifies that {@see Socket::constructFromResources} works as expected
+     * Verifies that {@see Socket::constructFromResources} works as expected.
      */
     public function testSocketCanBeConstructedFromResources()
     {
@@ -55,7 +55,7 @@ class SocketTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($result));
         $this->assertEquals(2, count($result));
-        foreach($result as $singleResult) {
+        foreach ($result as $singleResult) {
             $this->assertInstanceOf(Socket::class, $singleResult);
         }
 
