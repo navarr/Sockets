@@ -8,9 +8,11 @@ use Navarr\Socket\Socket;
 
 class EchoServer extends Server
 {
-    public function __construct($address = null, $port = 7)
+    const DEFAULT_PORT = 7;
+
+    public function __construct($address = null, $port = self::DEFAULT_PORT)
     {
-        parent::__construct($address, 7);
+        parent::__construct($address, $port);
         $this->addHook(Server::HOOK_CONNECT, [$this, 'onConnect']);
         $this->addHook(Server::HOOK_INPUT, [$this, 'onInput']);
         $this->addHook(Server::HOOK_DISCONNECT, [$this, 'onDisconnect']);
