@@ -37,4 +37,35 @@ class SocketTest extends \PHPUnit_Framework_TestCase
         $socket = Socket::create(AF_INET, SOCK_STREAM, SOL_TCP);
         $socket->write('test', 4);
     }
+
+    /**
+     * Verifies that {@see Socket::constructFromResources} works as expected
+     */
+    public function testSocketCanBeConstructedFromResources()
+    {
+        $resourceA = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $resourceB = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+
+        $reflectionMethod = new \ReflectionMethod(Socket::class, 'constructFromResources');
+        $reflectionMethod->setAccessible(true);
+        $func = $reflectionMethod->getClosure();
+
+        /** @var Socket[] $result */
+        $result = $func([$resourceA, $resourceB]);
+
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(2, count($result));
+        foreach($result as $singleResult) {
+            $this->assertInstanceOf(Socket::class, $singleResult);
+        }
+
+        $resultA = $result[0];
+        $resultB = $result[1];
+
+        $reflectionProperty = new \ReflectionProperty($resultA, 'resource');
+        $reflectionProperty->setAccessible(true);
+
+        $this->assertEquals($resourceA, $reflectionProperty->getValue($resultA));
+        $this->assertEquals($resourceB, $reflectionProperty->getValue($resultB));
+    }
 }

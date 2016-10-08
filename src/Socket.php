@@ -193,13 +193,9 @@ class Socket
      */
     protected static function constructFromResources(array $resources)
     {
-        $sockets = [];
-
-        foreach ($resources as $resource) {
-            $sockets[] = new self($resource);
-        }
-
-        return $sockets;
+        return array_map(function($resource) {
+            return new self($resource);
+        }, $resources);
     }
 
     /**
