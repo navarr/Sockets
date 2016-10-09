@@ -7,7 +7,7 @@ use Navarr\Socket\Socket;
 class SocketTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Verifies that {@see Socket::create}} works as expected. (happy-path)
+     * Verifies that {@see Socket::create}} works as expected. (happy-path).
      */
     public function testSocketCreate()
     {
