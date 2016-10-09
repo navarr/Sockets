@@ -672,9 +672,10 @@ class Socket
     /**
      * Performs the closure function.  If it returns false, throws a SocketException using the provided resource.
      *
-     * @throws SocketException
      * @param resource $resource Socket Resource
      * @param callable $closure  A function that takes 1 parameter (a socket resource)
+     *
+     * @throws SocketException
      */
     protected static function exceptionOnFalse($resource, callable $closure)
     {
