@@ -496,7 +496,7 @@ class Socket
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function($resource) use ($backlog) {
+            function ($resource) use ($backlog) {
                 return @socket_listen($resource, $backlog);
             }
         );
@@ -674,7 +674,7 @@ class Socket
      *
      * @throws SocketException
      * @param resource $resource Socket Resource
-     * @param callable $closure A function that takes 1 parameter (a socket resource)
+     * @param callable $closure  A function that takes 1 parameter (a socket resource)
      */
     protected static function exceptionOnFalse($resource, callable $closure)
     {
