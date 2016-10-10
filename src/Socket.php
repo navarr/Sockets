@@ -130,13 +130,12 @@ class Socket
      */
     public function bind($address, $port = 0)
     {
-        $return = @socket_bind($this->resource, $address, $port);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return true;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use ($address, $port) {
+                return @socket_bind($resource, $address, $port);
+            }
+        );
     }
 
     /**
@@ -175,13 +174,12 @@ class Socket
      */
     public function connect($address, $port = 0)
     {
-        $return = @socket_connect($this->resource, $address, $port);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return true;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use ($address, $port) {
+                return @socket_connect($resource, $address, $port);
+            }
+        );
     }
 
     /**
@@ -193,13 +191,9 @@ class Socket
      */
     protected static function constructFromResources(array $resources)
     {
-        $sockets = [];
-
-        foreach ($resources as $resource) {
-            $sockets[] = new self($resource);
-        }
-
-        return $sockets;
+        return array_map(function ($resource) {
+            return new self($resource);
+        }, $resources);
     }
 
     /**
@@ -388,13 +382,12 @@ class Socket
      */
     public function getOption($level, $optname)
     {
-        $return = @socket_get_option($this->resource, $level, $optname);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return $return;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use ($level, $optname) {
+                return @socket_get_option($resource, $level, $optname);
+            }
+        );
     }
 
     /**
@@ -416,13 +409,12 @@ class Socket
      */
     public function getPeerName(&$address, &$port)
     {
-        $return = @socket_getpeername($this->resource, $address, $port);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return $return;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use (&$address, &$port) {
+                return @socket_getpeername($resource, $address, $port);
+            }
+        );
     }
 
     /**
@@ -452,13 +444,12 @@ class Socket
             return false;
         }
 
-        $return = @socket_getsockname($this->resource, $address, $port);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return $return;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use (&$address, &$port) {
+                return @socket_getsockname($resource, $address, $port);
+            }
+        );
     }
 
     /**
@@ -466,7 +457,7 @@ class Socket
      *
      * <p>Imports a stream that encapsulates a socket into a socket extension resource.</p>
      *
-     * @param $stream The stream resource to import.
+     * @param resource $stream The stream resource to import.
      *
      * @throws Exception\SocketException If the import of the stream is not successful.
      *
@@ -476,7 +467,7 @@ class Socket
     {
         $return = @socket_import_stream($stream);
 
-        if ($return === false) {
+        if ($return === false || is_null($return)) {
             throw new SocketException($stream);
         }
 
@@ -503,13 +494,12 @@ class Socket
      */
     public function listen($backlog = 0)
     {
-        $return = socket_listen($this->resource, $backlog);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return true;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use ($backlog) {
+                return @socket_listen($resource, $backlog);
+            }
+        );
     }
 
     /**
@@ -534,13 +524,12 @@ class Socket
      */
     public function read($length, $type = PHP_BINARY_READ)
     {
-        $return = @socket_read($this->resource, $length, $type);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return $return;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use ($length, $type) {
+                return @socket_read($resource, $length, $type);
+            }
+        );
     }
 
     /**
@@ -567,13 +556,12 @@ class Socket
      */
     public function receive(&$buffer, $length, $flags)
     {
-        $return = @socket_recv($this->resource, $buffer, $length, $flags);
-
-        if ($return === false) {
-            throw new SocketException($this->resource);
-        }
-
-        return $return;
+        return static::exceptionOnFalse(
+            $this->resource,
+            function ($resource) use (&$buffer, $length, $flags) {
+                return @socket_recv($resource, $buffer, $length, $flags);
+            }
+        );
     }
 
     /**
@@ -679,6 +667,25 @@ class Socket
         return array_map(function ($rawSocket) {
             return self::$map[(string) $rawSocket];
         }, $sockets);
+    }
+
+    /**
+     * Performs the closure function.  If it returns false, throws a SocketException using the provided resource.
+     *
+     * @param resource $resource Socket Resource
+     * @param callable $closure  A function that takes 1 parameter (a socket resource)
+     *
+     * @throws SocketException
+     */
+    protected static function exceptionOnFalse($resource, callable $closure)
+    {
+        $result = $closure($resource);
+
+        if ($result === false) {
+            throw new SocketException($resource);
+        }
+
+        return $result;
     }
 
     /**

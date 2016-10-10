@@ -6,6 +6,12 @@ class SocketException extends \Exception
 {
     protected $message = 'Socket Exception';
 
+    /**
+     * SocketException constructor.
+     *
+     * @param string|resource|null $message Provide a resource instead of a message to use the socket_last_error as the
+     *                                      message
+     */
     public function __construct($message = null)
     {
         if (!$message) {

@@ -8,11 +8,13 @@ use Navarr\Socket\Socket;
 
 class WebServer extends Server
 {
+    const DEFAULT_PORT = 80;
+
     /** @var WebClient[] */
     protected $clientMap;
     protected $readType = PHP_BINARY_READ;
 
-    public function __construct($address = null, $port = 80)
+    public function __construct($address = null, $port = self::DEFAULT_PORT)
     {
         parent::__construct($address, $port);
         $this->addHook(Server::HOOK_CONNECT, [$this, 'onConnect']);
