@@ -72,5 +72,5 @@ This project uses [phpdoc](https://www.phpdoc.org/) to generate documentation. T
 
 ```bash
 composer install # this will install all of the development dependencies for this project
-vendor/phpdocumentor/phpdocumentor/bin/phpdoc -d ./src -t ./docs # this will generate the documentation into a docs directory
+vendor/bin/phpdoc -d ./src -t ./docs # this will generate the documentation into a docs directory
 ```
