@@ -17,7 +17,8 @@
   "license": "MIT",
   "require-dev": {
     "symfony/class-loader": "2.2.x-dev",
-    "phpunit/phpunit": "3.7.*"
+    "phpunit/phpunit": "3.7.*",
+    "phpdocumentor/phpdocumentor": "^2.9"
   },
   "autoload": {
     "psr-4": {
