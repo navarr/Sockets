@@ -12,7 +12,7 @@ Sockets is a PHP Library intent on making working with PHP Sockets easier, inclu
 
 ## Work in Progress
 
-The code is currently still a work in progress, with the Socket class itself not yet fully complete.  There is a lot I still need to understand how sockets work both in PHP and probably in C in order to make everything work amazingly.
+The code is currently still a work in progress, with the Socket class itself not yet fully complete.  There is a lot I still need to understand about how sockets work both in PHP and probably in C in order to make everything work amazingly.
 
 Not everything is tested yet, and not everything works properly yet.
 
