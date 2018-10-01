@@ -12,7 +12,7 @@ Sockets is a PHP Library intent on making working with PHP Sockets easier, inclu
 
 ## Work in Progress
 
-The code is currently still a work in progress, with the Socket class itself not yet fully complete.  There is a lot I still need to understand about how sockets work both in PHP and probably in C in order to make everything work amazingly.
+The code is currently still a work in progress, with the Socket class itself not yet fully complete.  There is a lot I still need to understand how sockets work both in PHP and probably in C in order to make everything work amazingly.
 
 Not everything is tested yet, and not everything works properly yet.
 
@@ -68,7 +68,7 @@ $server = new EchoServer('0.0.0.0');
 
 ### Documentation
 
-This project uses [phpdoc](https://www.phpdoc.org/) to generate documentation. To generate the documentation, you will need to satisfy some dependencies. First, you need to get [graphviz](http://www.graphviz.org/). It is available through most linux distros, but you can always download it and install it from the site if you aren't on linux. If you install manually, make sure the binaries are on your PATH somewhere. Next run the following commands within this directory (assumes you already have [composer](https://getcomposer.org/) installed and available on your path as `composer`).
+This project uses [phpdoc](https://www.phpdoc.org/) to generate documentation. To generate the documentation, you will need to satisfy some dependencies. First, you need to get [graphviz](http://www.graphviz.org/). It is available through most Linux distros, but you can always download it and install it from the site if you aren't on Linux. If you install manually, make sure the binaries are on your PATH somewhere. Next, run the following commands within this directory (assumes you already have [composer](https://getcomposer.org/) installed and available on your path as `composer`).
 
 ```bash
 composer install # this will install all of the development dependencies for this project
