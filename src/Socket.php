@@ -3,36 +3,44 @@
 namespace Navarr\Socket;
 
 use Navarr\Socket\Exception\SocketException;
+use Socket as SocketResource;
+use Stringable;
+
+use function spl_object_hash;
 
 /**
  * Class Socket.
  *
  * <p>A simple wrapper for PHP's socket functions.</p>
  */
-class Socket
+class Socket implements Stringable
 {
     /**
-     * @var resource Will store a reference to the php socket object.
+     * @var SocketResource Will store a reference to the php socket object.
      */
-    protected $resource = null;
+    protected ?SocketResource $resource = null;
+
     /**
      * @var int Should be set to one of the php predefined constants for Sockets - AF_UNIX, AF_INET, or AF_INET6
      */
-    protected $domain = null;
+    protected int $domain;
+
     /**
      * @var int Should be set to one of the php predefined constants for Sockets - SOCK_STREAM, SOCK_DGRAM,
      *          SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM
      */
-    protected $type = null;
+    protected int $type;
+
     /**
      * @var int Should be set to the protocol number to be used. Can use getprotobyname to get the value.
      *          Alternatively, there are two predefined constants for Sockets that could be used - SOL_TCP, SOL_UDP
      */
-    protected $protocol = null;
+    protected int $protocol;
+
     /**
      * @var array An internal storage of php socket resources and their associated Socket object.
      */
-    protected static $map = [];
+    protected static array $map = [];
 
     /**
      * Sets up the Socket Resource and stores it in the local map.
@@ -43,13 +51,13 @@ class Socket
      *
      * @see Socket::create()
      *
-     * @param resource $resource The php socket resource. This is just a reference to the socket object created using
-     *                           the <code>socket_create</code> method.
+     * @param SocketResource $resource The php socket resource. This is just a reference to the socket object created
+     *                                 using the <code>socket_create</code> method.
      */
-    protected function __construct($resource)
+    protected function __construct(SocketResource $resource)
     {
         $this->resource = $resource;
-        self::$map[(string) $resource] = $this;
+        self::$map[$this->__toString()] = $this;
     }
 
     /**
@@ -58,7 +66,7 @@ class Socket
     public function __destruct()
     {
         $this->close();
-        $this->resource = null;
+        unset($this->resource);
     }
 
     /**
@@ -74,9 +82,9 @@ class Socket
      *
      * @return string The string representation of the resource or an empty string if the resource was null.
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return (string) $this->resource;
+        return $this->resource ? spl_object_hash($this->resource) : '';
     }
 
     /**
@@ -101,7 +109,7 @@ class Socket
      *
      * @return Socket A new Socket representation of the accepted socket.
      */
-    public function accept()
+    public function accept(): self
     {
         $return = @socket_accept($this->resource);
 
@@ -121,14 +129,14 @@ class Socket
      * @param string $address <p>If the socket is of the AF_INET family, the address is an IP in dotted-quad
      *                        notation (e.g. <code>127.0.0.1</code>).</p> <p>If the socket is of the AF_UNIX family, the address is the path
      *                        of the Unix-domain socket (e.g. <code>/tmp/my.sock</code>).</p>
-     * @param int    $port    <p>(Optional) The port parameter is only used when binding an AF_INET socket, and designates the port
+     * @param int $port    <p>(Optional) The port parameter is only used when binding an AF_INET socket, and designates the port
      *                        on which to listen for connections.</p>
      *
-     * @throws Exception\SocketException If the bind was unsuccessful.
-     *
      * @return bool <p>Returns <code>true</code> if the bind was successful.</p>
+     *@throws Exception\SocketException If the bind was unsuccessful.
+     *
      */
-    public function bind($address, $port = 0)
+    public function bind(string $address, int $port = 0): bool
     {
         return static::exceptionOnFalse(
             $this->resource,
@@ -142,12 +150,10 @@ class Socket
      * Close the socket.
      *
      * <p>Closes the php socket resource currently in use and removes the reference to it in the internal map.</p>
-     *
-     * @return void
      */
-    public function close()
+    public function close(): void
     {
-        unset(self::$map[(string) $this->resource]);
+        unset(self::$map[$this->__toString()]);
         @socket_close($this->resource);
     }
 
@@ -172,11 +178,11 @@ class Socket
      *
      * @return bool <p>Returns <code>true</code> if the connect was successful.
      */
-    public function connect($address, $port = 0)
+    public function connect(string $address, int $port = 0): bool
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use ($address, $port) {
+            static function ($resource) use ($address, $port) {
                 return @socket_connect($resource, $address, $port);
             }
         );
@@ -189,9 +195,9 @@ class Socket
      *
      * @return Socket[] <p>Returns an array of Socket objects built from the given php socket resources.</p>
      */
-    protected static function constructFromResources(array $resources)
+    protected static function constructFromResources(array $resources): array
     {
-        return array_map(function ($resource) {
+        return array_map(static function ($resource) {
             return new self($resource);
         }, $resources);
     }
@@ -237,7 +243,7 @@ class Socket
      *
      * @return Socket Returns a Socket object based on the successful creation of the php socket.
      */
-    public static function create($domain, $type, $protocol)
+    public static function create(int $domain, int $type, int $protocol): self
     {
         $return = @socket_create($domain, $type, $protocol);
 
@@ -271,7 +277,7 @@ class Socket
      *
      * @return Socket Returns a Socket object based on the successful creation of the php socket.
      */
-    public static function createListen($port, $backlog = 128)
+    public static function createListen(int $port, int $backlog = 128): self
     {
         $return = @socket_create_listen($port, $backlog);
 
@@ -307,7 +313,7 @@ class Socket
      *
      * @return Socket[] An array of Socket objects containing identical sockets.
      */
-    public static function createPair($domain, $type, $protocol)
+    public static function createPair(int $domain, int $type, int $protocol): self
     {
         $array = [];
         $return = @socket_create_pair($domain, $type, $protocol, $array);
@@ -380,11 +386,11 @@ class Socket
      *
      * @return mixed See the descriptions based on the option being requested above.
      */
-    public function getOption($level, $optname)
+    public function getOption(int $level, int $optname): mixed
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use ($level, $optname) {
+            static function ($resource) use ($level, $optname) {
                 return @socket_get_option($resource, $level, $optname);
             }
         );
@@ -407,11 +413,11 @@ class Socket
      *
      * @return bool <p>Returns <code>true</code> if the retrieval of the peer name was successful.</p>
      */
-    public function getPeerName(&$address, &$port)
+    public function getPeerName(string &$address, int &$port)
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use (&$address, &$port) {
+            static function ($resource) use (&$address, &$port) {
                 return @socket_getpeername($resource, $address, $port);
             }
         );
@@ -438,7 +444,7 @@ class Socket
      *
      * @return bool <p>Returns <code>true</code> if the retrieval of the socket name was successful.</p>
      */
-    public function getSockName(&$address, &$port)
+    public function getSockName(string &$address, int &$port): bool
     {
         if (!in_array($this->domain, [AF_UNIX, AF_INET, AF_INET6])) {
             return false;
@@ -446,7 +452,7 @@ class Socket
 
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use (&$address, &$port) {
+            static function ($resource) use (&$address, &$port) {
                 return @socket_getsockname($resource, $address, $port);
             }
         );
@@ -463,7 +469,7 @@ class Socket
      *
      * @return Socket Returns a Socket object based on the stream.
      */
-    public static function importStream($stream)
+    public static function importStream(SocketResource $stream): self
     {
         $return = @socket_import_stream($stream);
 
@@ -492,11 +498,11 @@ class Socket
      *
      * @return bool <p>Returns <code>true</code> on success.
      */
-    public function listen($backlog = 0)
+    public function listen(int $backlog = 0): bool
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use ($backlog) {
+            static function ($resource) use ($backlog) {
                 return @socket_listen($resource, $backlog);
             }
         );
@@ -522,11 +528,11 @@ class Socket
      * @return string Returns the data as a string. Returns a zero length string ("") when there is no more data to
      *                read.
      */
-    public function read($length, $type = PHP_BINARY_READ)
+    public function read(int $length, int $type = PHP_BINARY_READ): string
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use ($length, $type) {
+            static function ($resource) use ($length, $type) {
                 return @socket_read($resource, $length, $type);
             }
         );
@@ -554,11 +560,11 @@ class Socket
      *
      * @return int Returns the number of bytes received.
      */
-    public function receive(&$buffer, $length, $flags)
+    public function receive(string &$buffer, int $length, int $flags): int
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use (&$buffer, $length, $flags) {
+            static function ($resource) use (&$buffer, $length, $flags) {
                 return @socket_recv($resource, $buffer, $length, $flags);
             }
         );
@@ -592,25 +598,15 @@ class Socket
      *             timeout expires before anything interesting happens.
      */
     public static function select(
-        &$read,
-        &$write,
-        &$except,
-        $timeoutSeconds,
-        $timeoutMilliseconds = 0
-    ) {
-        $readSockets = null;
-        $writeSockets = null;
-        $exceptSockets = null;
-
-        if (!is_null($read)) {
-            $readSockets = self::mapClassToRawSocket($read);
-        }
-        if (!is_null($write)) {
-            $writeSockets = self::mapClassToRawSocket($write);
-        }
-        if (!is_null($except)) {
-            $exceptSockets = self::mapClassToRawSocket($except);
-        }
+        array &$read,
+        array &$write,
+        array &$except,
+        int $timeoutSeconds,
+        int $timeoutMilliseconds = 0
+    ): int {
+        $readSockets = self::mapClassToRawSocket($read);
+        $writeSockets = self::mapClassToRawSocket($write);
+        $exceptSockets = self::mapClassToRawSocket($except);
 
         $return = @socket_select(
             $readSockets,
@@ -646,38 +642,44 @@ class Socket
      *
      * @param Socket[] $sockets An array of sockets to map.
      *
-     * @return resource[] Returns the corresponding array of resources.
+     * @return SocketResource[] Returns the corresponding array of resources.
      */
-    protected static function mapClassToRawSocket($sockets)
+    protected static function mapClassToRawSocket(array $sockets)
     {
-        return array_map(function (Socket $socket) {
-            return $socket->resource;
-        }, $sockets);
+        return array_map(
+            static function (Socket $socket) {
+                return $socket->resource;
+            },
+            $sockets
+        );
     }
 
     /**
      * Maps an array of socket resources to an array of Sockets.
      *
-     * @param resource[] $sockets An array of socket resources to map.
+     * @param SocketResource[] $sockets An array of socket resources to map.
      *
      * @return Socket[] Returns the corresponding array of Socket objects.
      */
-    protected static function mapRawSocketToClass($sockets)
+    protected static function mapRawSocketToClass(array $sockets): array
     {
-        return array_map(function ($rawSocket) {
-            return self::$map[(string) $rawSocket];
-        }, $sockets);
+        return array_map(
+            static function ($rawSocket) {
+                return self::$map[spl_object_hash($rawSocket)];
+            },
+            $sockets
+        );
     }
 
     /**
      * Performs the closure function.  If it returns false, throws a SocketException using the provided resource.
      *
-     * @param resource $resource Socket Resource
+     * @param SocketResource $resource Socket Resource
      * @param callable $closure  A function that takes 1 parameter (a socket resource)
      *
      * @throws SocketException
      */
-    protected static function exceptionOnFalse($resource, callable $closure)
+    protected static function exceptionOnFalse(SocketResource $resource, callable $closure): mixed
     {
         $result = $closure($resource);
 
@@ -694,14 +696,14 @@ class Socket
      * <p>The function <code>write()</code> writes to the socket from the given buffer.</p>
      *
      * @param string $buffer The buffer to be written.
-     * @param int    $length The optional parameter length can specify an alternate length of bytes written to the socket.
-     *                       If this length is greater than the buffer length, it is silently truncated to the length of the buffer.
+     * @param ?int   $length The optional parameter length can specify an alternate length of bytes written to the
+     * socket. If this length is greater than the buffer length, it is silently truncated to the length of the buffer.
      *
      * @throws Exception\SocketException If there was a failure.
      *
      * @return int Returns the number of bytes successfully written to the socket.
      */
-    public function write($buffer, $length = null)
+    public function write(string $buffer, int $length = null): int
     {
         if (null === $length) {
             $length = strlen($buffer);
@@ -744,7 +746,7 @@ class Socket
      *
      * @return int Returns the number of bytes sent.
      */
-    public function send($buffer, $flags = 0, $length = null)
+    public function send(string $buffer, int $flags = 0, int $length = null): int
     {
         if (null === $length) {
             $length = strlen($buffer);
@@ -780,10 +782,8 @@ class Socket
      *
      * @param bool $bool Flag to indicate if the Socket should block (<code>true</code>) or not block
      *                   (<code>false</code>).
-     *
-     * @return void
      */
-    public function setBlocking($bool)
+    public function setBlocking(bool $bool): void
     {
         if ($bool) {
             @socket_set_block($this->resource);
