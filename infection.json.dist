@@ -8,7 +8,7 @@
         "configDir": "."
     },
     "mutators": {
-        "@default": true,
+        "@default": true
     },
     "logs": {
         "stryker": {
