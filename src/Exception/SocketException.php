@@ -2,22 +2,21 @@
 
 namespace Navarr\Socket\Exception;
 
-class SocketException extends \Exception
+use Exception;
+use Socket;
+
+class SocketException extends Exception
 {
     protected $message = 'Socket Exception';
 
     /**
-     * SocketException constructor.
-     *
-     * @param string|resource|null $message Provide a resource instead of a message to use the socket_last_error as the
-     *                                      message
+     * @param string|Socket|null $message Provide a resource instead of a message to use the socket_last_error as the
+     *                                    message
      */
-    public function __construct($message = null)
+    public function __construct(string|Socket|null $message = null)
     {
-        if (!$message) {
-            $errno = socket_last_error();
-        } elseif (is_resource($message)) {
-            $errno = socket_last_error($message);
+        if (!$message || $message instanceof Socket) {
+            $errno = socket_last_error($message ?: null);
         } else {
             parent::__construct((string) $message);
 
