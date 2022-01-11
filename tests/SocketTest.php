@@ -3,8 +3,9 @@
 namespace Navarr\Socket\Test;
 
 use Navarr\Socket\Socket;
+use PHPUnit\Framework\TestCase;
 
-class SocketTest extends \PHPUnit_Framework_TestCase
+class SocketTest extends TestCase
 {
     /**
      * Verifies that {@see Socket::create}} works as expected. (happy-path).
