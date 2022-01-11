@@ -11,18 +11,26 @@
     }
   ],
   "require": {
-    "php": ">=5.6",
+    "php": "^7.4|^8",
     "ext-sockets": "*"
   },
   "license": "MIT",
   "require-dev": {
-    "symfony/class-loader": "2.2.x-dev",
-    "phpunit/phpunit": "3.7.*",
-    "phpdocumentor/phpdocumentor": "^2.9"
+    "phpunit/phpunit": "^9.5",
+    "phpstan/phpstan": "^1",
+    "infection/infection": "^0.26",
+    "squizlabs/php_codesniffer": "^3.6",
+    "jetbrains/phpstorm-attributes": "^1",
+    "roave/security-advisories": "dev-master"
   },
   "autoload": {
     "psr-4": {
       "Navarr\\Socket\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Navarr\\Socket\\Test\\": "tests/"
     }
   },
   "scripts": {

@@ -3,8 +3,9 @@
 namespace Navarr\Socket\Test;
 
 use Navarr\Socket\Server;
+use PHPUnit\Framework\TestCase;
 
-class ServerTest extends \PHPUnit_Framework_TestCase
+class ServerTest extends TestCase
 {
     public function testAddingSingleHookWorksProperly()
     {

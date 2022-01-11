@@ -1,0 +1,99 @@
+name: Continuous Integration
+on: [push]
+
+jobs:
+  phpunit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [7.4, 8.0, 8.1]
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: composer install
+
+      - name: Test
+        run: vendor/bin/phpunit tests --testdox --coverage-clover coverage.xml
+
+      - name: Upload to CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          fail_ci_if_error: true
+
+  phpstan:
+    name: Static Analysis Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [7.4, 8.0, 8.1]
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: composer install
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan
+
+  phpcs:
+    name: Code Style (PSR-12)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          tools: composer:v2
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: composer install
+
+      - name: PHP Code Sniffer
+        run: vendor/bin/phpcs
+
+  infection:
+    name: Infection Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ 7.4, 8.0, 8.1 ]
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Check for Mutants
+        env:
+          INFECTION_BADGE_API_KEY: ${{ secrets.STRYKER_TOKEN }}
+        run: vendor/bin/infection --threads=$(nproc) --no-progress --logger-github
