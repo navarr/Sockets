@@ -479,7 +479,7 @@ class Socket implements Stringable
         $return = @socket_import_stream($stream);
 
         if ($return === false || is_null($return)) {
-            throw new SocketException($stream);
+            throw new SocketException($stream instanceof Socketresource ? $stream : null);
         }
 
         return new self($return);
@@ -802,6 +802,7 @@ class Socket implements Stringable
     public function setBlocking(bool $bool): void
     {
         $this->checkInvalidResourceState();
+
         if ($bool) {
             @socket_set_block($this->resource);
         } else {
