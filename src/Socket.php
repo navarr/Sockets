@@ -38,7 +38,7 @@ class Socket implements Stringable
     protected int $protocol;
 
     /**
-     * @var array An internal storage of php socket resources and their associated Socket object.
+     * @var array<string, Socket> An internal storage of php socket resources and their associated Socket object.
      */
     protected static array $map = [];
 
@@ -111,6 +111,8 @@ class Socket implements Stringable
      */
     public function accept(): self
     {
+        $this->checkInvalidResourceState();
+
         $return = @socket_accept($this->resource);
 
         if ($return === false) {
@@ -153,6 +155,9 @@ class Socket implements Stringable
      */
     public function close(): void
     {
+        if ($this->resource === null) {
+            return;
+        }
         unset(self::$map[$this->__toString()]);
         @socket_close($this->resource);
     }
@@ -191,7 +196,7 @@ class Socket implements Stringable
     /**
      * Build Socket objects based on an array of php socket resources.
      *
-     * @param array $resources The resources parameter is a list of php socket resource objects.
+     * @param SocketResource[] $resources A list of php socket resource objects.
      *
      * @return Socket[] <p>Returns an array of Socket objects built from the given php socket resources.</p>
      */
@@ -313,7 +318,7 @@ class Socket implements Stringable
      *
      * @return Socket[] An array of Socket objects containing identical sockets.
      */
-    public static function createPair(int $domain, int $type, int $protocol): self
+    public static function createPair(int $domain, int $type, int $protocol): array
     {
         $array = [];
         $return = @socket_create_pair($domain, $type, $protocol, $array);
@@ -413,7 +418,7 @@ class Socket implements Stringable
      *
      * @return bool <p>Returns <code>true</code> if the retrieval of the peer name was successful.</p>
      */
-    public function getPeerName(string &$address, int &$port)
+    public function getPeerName(string &$address, int &$port): bool
     {
         return static::exceptionOnFalse(
             $this->resource,
@@ -469,7 +474,7 @@ class Socket implements Stringable
      *
      * @return Socket Returns a Socket object based on the stream.
      */
-    public static function importStream(SocketResource $stream): self
+    public static function importStream($stream): self
     {
         $return = @socket_import_stream($stream);
 
@@ -585,7 +590,7 @@ class Socket implements Stringable
      *                                      ready on end-of-file, in which case a <code>read()</code> will return a zero length string).</p>
      * @param Socket[] &$write              The sockets listed in the write array will be watched to see if a write will not block.
      * @param Socket[] &$except             he sockets listed in the except array will be watched for exceptions.
-     * @param int      $timeoutSeconds      The seconds portion of the timeout parameters (in conjunction with
+     * @param ?int     $timeoutSeconds      The seconds portion of the timeout parameters (in conjunction with
      *                                      timeoutMilliseconds). The timeout is an upper bound on the amount of time elapsed before <code>select()</code>
      *                                      returns. timeoutSeconds may be zero, causing the <code>select()</code> to return immediately. This is useful for
      *                                      polling. If timeoutSeconds is <code>NULL</code> (no timeout), the <code>select()</code> can block
@@ -601,7 +606,7 @@ class Socket implements Stringable
         array &$read,
         array &$write,
         array &$except,
-        int $timeoutSeconds,
+        ?int $timeoutSeconds,
         int $timeoutMilliseconds = 0
     ): int {
         $readSockets = self::mapClassToRawSocket($read);
@@ -644,13 +649,15 @@ class Socket implements Stringable
      *
      * @return SocketResource[] Returns the corresponding array of resources.
      */
-    protected static function mapClassToRawSocket(array $sockets)
+    protected static function mapClassToRawSocket(array $sockets): array
     {
-        return array_map(
-            static function (Socket $socket) {
-                return $socket->resource;
-            },
-            $sockets
+        return array_filter(
+            array_map(
+                static function (Socket $socket) {
+                    return $socket->resource;
+                },
+                $sockets
+            )
         );
     }
 
@@ -674,13 +681,19 @@ class Socket implements Stringable
     /**
      * Performs the closure function.  If it returns false, throws a SocketException using the provided resource.
      *
-     * @param SocketResource $resource Socket Resource
-     * @param callable $closure  A function that takes 1 parameter (a socket resource)
+     * @template T
+     * @param ?SocketResource $resource Socket Resource
+     * @param callable(SocketResource):T $closure  A function that takes 1 parameter (a socket resource)
+     * @return T
      *
      * @throws SocketException
      */
-    protected static function exceptionOnFalse(SocketResource $resource, callable $closure): mixed
+    protected static function exceptionOnFalse(?SocketResource $resource, callable $closure): mixed
     {
+        if ($resource === null) {
+            throw new SocketException('Socket is not connected');
+        }
+
         $result = $closure($resource);
 
         if ($result === false) {
@@ -748,6 +761,8 @@ class Socket implements Stringable
      */
     public function send(string $buffer, int $flags = 0, int $length = null): int
     {
+        $this->checkInvalidResourceState();
+
         if (null === $length) {
             $length = strlen($buffer);
         }
@@ -782,13 +797,25 @@ class Socket implements Stringable
      *
      * @param bool $bool Flag to indicate if the Socket should block (<code>true</code>) or not block
      *                   (<code>false</code>).
+     * @throws SocketException
      */
     public function setBlocking(bool $bool): void
     {
+        $this->checkInvalidResourceState();
         if ($bool) {
             @socket_set_block($this->resource);
         } else {
             @socket_set_nonblock($this->resource);
+        }
+    }
+
+    /**
+     * @throws SocketException
+     */
+    private function checkInvalidResourceState(): void
+    {
+        if (null === $this->resource) {
+            throw new SocketException('Socket is not connected');
         }
     }
 }

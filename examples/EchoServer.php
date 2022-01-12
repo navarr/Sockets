@@ -8,7 +8,7 @@ use Navarr\Socket\Socket;
 
 class EchoServer extends Server
 {
-    const DEFAULT_PORT = 7;
+    const DEFAULT_PORT = 7000;
 
     public function __construct($address = null, $port = self::DEFAULT_PORT)
     {

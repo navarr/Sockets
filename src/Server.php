@@ -9,7 +9,7 @@ class Server
     /**
      * A Multi-dimensional array of callable arrays mapped by hook name.
      *
-     * @var array
+     * @var array<string, callable[]>
      */
     protected array $hooks = [];
 
@@ -117,18 +117,23 @@ class Server
      * @param ?int $timeout Seconds to wait on a socket before timing it out
      * @throws Exception\SocketException
      */
-    public function __construct(string $address, int $port = 0, int $timeout = null)
+    public function __construct(string $address, int $port = 0, ?int $timeout = 0)
     {
         set_time_limit(0);
         $this->address = $address;
         $this->port = $port;
         $this->timeout = $timeout;
 
-        $this->domain = match (true) {
-            filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) => AF_INET,
-            filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) => AF_INET6,
-            default => AF_UNIX,
-        };
+        switch (true) {
+            case filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4):
+                $this->domain = AF_INET;
+                break;
+            case filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6):
+                $this->domain = AF_INET6;
+                break;
+            default:
+                $this->domain = AF_UNIX;
+        }
 
         $this->masterSocket = Socket::create($this->domain, SOCK_STREAM, 0);
         $this->masterSocket->bind($this->address, $this->port);
