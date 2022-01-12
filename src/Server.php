@@ -178,7 +178,8 @@ class Server
         $write = null;
         $except = null;
         $ret = Socket::select($read, $write, $except, $this->timeout);
-        if (!is_null($this->timeout)
+        if (
+            !is_null($this->timeout)
             && $ret === 0
             && $this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false
         ) {
