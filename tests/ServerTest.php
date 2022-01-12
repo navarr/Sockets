@@ -10,6 +10,7 @@ class ServerTest extends TestCase
     public function testAddingSingleHookWorksProperly()
     {
         $server = new Server('127.0.0.1', 9000);
+        $server->start();
         $exampleReturn = '__NAVARR_SOCKET_TEST_EXAMPLE_RETURN__';
         $server->addHook(
             Server::HOOK_CONNECT,

@@ -3,6 +3,7 @@
 namespace Navarr\Socket;
 
 use Navarr\Socket\Exception\SocketException;
+use Navarr\Socket\Exception\SocketException as SocketExceptionAlias;
 
 class Server
 {
@@ -46,9 +47,9 @@ class Server
     /**
      * The Master Socket.
      *
-     * @var Socket
+     * @var ?Socket
      */
-    protected Socket $masterSocket;
+    protected ?Socket $masterSocket = null;
 
     /**
      * Maximum Amount of Clients Allowed to Connect.
@@ -110,16 +111,15 @@ class Server
     public const RETURN_HALT_SERVER = '__NAVARR_HALT_SERVER__';
 
     /**
-     * Create an Instance of a Server rearing to go.
+     * Setup the configuration for the server
      *
      * @param string $address An IPv4, IPv6, or Unix socket address
      * @param int $port
      * @param ?int $timeout Seconds to wait on a socket before timing it out
-     * @throws Exception\SocketException
+     * @throws SocketException
      */
     public function __construct(string $address, int $port = 0, ?int $timeout = 0)
     {
-        set_time_limit(0);
         $this->address = $address;
         $this->port = $port;
         $this->timeout = $timeout;
@@ -134,7 +134,18 @@ class Server
             default:
                 $this->domain = AF_UNIX;
         }
+    }
 
+    /**
+     * Start the server, binding to ports and listening for connections.
+     *
+     * If you call {@see run} you do not need to call this method.
+     *
+     * @throws SocketExceptionAlias
+     */
+    public function start(): void
+    {
+        set_time_limit(0);
         $this->masterSocket = Socket::create($this->domain, SOCK_STREAM, 0);
         $this->masterSocket->bind($this->address, $this->port);
         $this->masterSocket->getSockName($this->address, $this->port);
@@ -143,18 +154,21 @@ class Server
 
     public function __destruct()
     {
-        $this->masterSocket->close();
+        $this->masterSocket?->close();
     }
 
     /**
      * Run the Server for as long as loopOnce returns true.
      *
-     * @see self.loopOnce
-     *
-     * @throws SocketException
+     * @throws SocketExceptionAlias
+     * @see loopOnce
      */
     public function run(): void
     {
+        if ($this->masterSocket === null) {
+            $this->start();
+        }
+
         do {
             $test = $this->loopOnce();
         } while ($test);
@@ -165,9 +179,9 @@ class Server
     /**
      * This is the main server loop.  This code is responsible for adding connections and triggering hooks.
      *
-     * @throws SocketException
-     *
      * @return bool Whether or not to shutdown the server
+     *@throws SocketExceptionAlias
+     *
      */
     protected function loopOnce(): bool
     {
@@ -227,7 +241,7 @@ class Server
      * Overrideable Read Functionality.
      *
      * @param Socket $client
-     * @throws SocketException
+     * @throws SocketExceptionAlias
      */
     protected function read(Socket $client): string
     {

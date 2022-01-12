@@ -8,11 +8,10 @@ use Navarr\Socket\Socket;
 
 class WebServer extends Server
 {
-    const DEFAULT_PORT = 80;
+    private const DEFAULT_PORT = 80;
 
     /** @var WebClient[] */
-    protected $clientMap;
-    protected $readType = PHP_BINARY_READ;
+    protected array $clientMap;
 
     public function __construct($address = null, $port = self::DEFAULT_PORT)
     {
@@ -32,9 +31,9 @@ class WebServer extends Server
     public function onInput(Server $server, Socket $client, $message)
     {
         $messages = explode("\n", $message);
-        foreach ($messages as $message) {
-            $message .= "\n";
-            $this->clientMap[(string) $client]->dispatch($message);
+        foreach ($messages as $messageLine) {
+            $messageLine .= "\n";
+            $this->clientMap[(string) $client]->dispatch($messageLine);
         }
     }
 
@@ -47,8 +46,8 @@ class WebServer extends Server
 
 class WebClient
 {
-    protected $server = null;
-    protected $socket = null;
+    protected Server $server;
+    protected Socket $socket;
     protected $firstLine = null;
     protected $verb = null;
     protected $resource = null;
