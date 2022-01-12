@@ -16,7 +16,7 @@ use function spl_object_hash;
 class Socket implements Stringable
 {
     /**
-     * @var SocketResource Will store a reference to the php socket object.
+     * @var ?SocketResource Will store a reference to the php socket object.
      */
     protected ?SocketResource $resource = null;
 
@@ -142,7 +142,7 @@ class Socket implements Stringable
     {
         return static::exceptionOnFalse(
             $this->resource,
-            function ($resource) use ($address, $port) {
+            static function ($resource) use ($address, $port) {
                 return @socket_bind($resource, $address, $port);
             }
         );
