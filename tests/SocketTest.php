@@ -3,7 +3,9 @@
 namespace Navarr\Socket\Test;
 
 use Navarr\Socket\Socket;
+use Navarr\Socket\Exception\SocketException;
 use PHPUnit\Framework\TestCase;
+use Socket as SocketResource;
 
 class SocketTest extends TestCase
 {
@@ -25,7 +27,7 @@ class SocketTest extends TestCase
         // Lets make sure that the resource is created properly
         $reflectionProperty = new \ReflectionProperty($socket, 'resource');
         $reflectionProperty->setAccessible(true);
-        $this->assertEquals('resource', gettype($reflectionProperty->getValue($socket)));
+        $this->assertEquals($reflectionProperty->getValue($socket) instanceof SocketResource);
 
         $propertyDomain = new \ReflectionProperty($socket, 'domain');
         $propertyDomain->setAccessible(true);
@@ -40,19 +42,9 @@ class SocketTest extends TestCase
         $this->assertEquals($protocol, $propertyProtocol->getValue($socket));
     }
 
-    /**
-     * @expectedException \Navarr\Socket\Exception\SocketException
-     */
-    public function testSocketCreateWithBadValuesThrowsSocketException()
-    {
-        Socket::create(9001, 9001, 9001);
-    }
-
-    /**
-     * @expectedException \Navarr\Socket\Exception\SocketException
-     */
     public function testSocketWithResourceThrowsSocketException()
     {
+        $this->expectException(SocketException::class);
         $socket = Socket::create(AF_INET, SOCK_STREAM, SOL_TCP);
         $socket->write('test', 4);
     }
