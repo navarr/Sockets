@@ -27,7 +27,7 @@ class SocketTest extends TestCase
         // Lets make sure that the resource is created properly
         $reflectionProperty = new \ReflectionProperty($socket, 'resource');
         $reflectionProperty->setAccessible(true);
-        $this->assertEquals($reflectionProperty->getValue($socket) instanceof SocketResource);
+        $this->assertTrue($reflectionProperty->getValue($socket) instanceof SocketResource);
 
         $propertyDomain = new \ReflectionProperty($socket, 'domain');
         $propertyDomain->setAccessible(true);
