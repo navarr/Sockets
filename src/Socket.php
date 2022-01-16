@@ -2,6 +2,7 @@
 
 namespace Navarr\Socket;
 
+use Error;
 use Navarr\Socket\Exception\SocketException;
 use Socket as SocketResource;
 use Stringable;
@@ -15,11 +16,6 @@ use function spl_object_hash;
  */
 class Socket implements Stringable
 {
-    /**
-     * @var ?SocketResource Will store a reference to the php socket object.
-     */
-    protected ?SocketResource $resource = null;
-
     /**
      * @var int Should be set to one of the php predefined constants for Sockets - AF_UNIX, AF_INET, or AF_INET6
      */
@@ -54,9 +50,8 @@ class Socket implements Stringable
      * @see Socket::create()
      *
      */
-    protected function __construct(SocketResource $resource)
+    protected function __construct(protected SocketResource $resource)
     {
-        $this->resource = $resource;
         self::$map[$this->__toString()] = $this;
     }
 
@@ -159,7 +154,13 @@ class Socket implements Stringable
             return;
         }
         unset(self::$map[$this->__toString()]);
-        @socket_close($this->resource);
+        try {
+            @socket_close($this->resource);
+        } catch (Error $e) {
+            if (!str_contains($e->getMessage(), 'has already been closed')) {
+                throw $e;
+            }
+        }
     }
 
     /**

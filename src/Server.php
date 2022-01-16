@@ -2,6 +2,7 @@
 
 namespace Navarr\Socket;
 
+use Error;
 use Navarr\Socket\Exception\SocketException;
 
 class Server
@@ -153,7 +154,7 @@ class Server
 
     public function __destruct()
     {
-        $this->masterSocket?->close();
+        $this->shutDownEverything();
     }
 
     /**
@@ -353,7 +354,14 @@ class Server
         foreach ($this->clients as $client) {
             $this->disconnect($client);
         }
-        $this->masterSocket->close();
+        try {
+            $this->masterSocket?->close();
+        } catch (Error $e) {
+            // Haven't solved this one yet, but harmless.
+            if (!str_contains($e->getMessage(), 'must not be accessed before initialization')) {
+                throw $e;
+            }
+        }
         unset(
             $this->hooks,
             $this->address,
