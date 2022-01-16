@@ -1,4 +1,10 @@
 parameters:
+    treatPhpDocTypesAsCertain: false
     level: 9
     paths:
         - src
+    ignoreErrors:
+        - message: '#@return contains unresolvable type#'
+          path: src/Socket.php
+        - message: '#should return (string|int) but returns bool\|#'
+          path: src/Socket.php

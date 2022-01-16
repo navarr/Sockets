@@ -3,6 +3,7 @@
 namespace Navarr\Socket;
 
 use Error;
+use InvalidArgumentException;
 use Navarr\Socket\Exception\SocketException;
 use Socket as SocketResource;
 use Stringable;
@@ -79,7 +80,7 @@ class Socket implements Stringable
      */
     public function __toString(): string
     {
-        return $this->resource ? spl_object_hash($this->resource) : '';
+        return spl_object_hash($this->resource);
     }
 
     /**
@@ -106,8 +107,6 @@ class Socket implements Stringable
      */
     public function accept(): self
     {
-        $this->checkInvalidResourceState();
-
         $return = @socket_accept($this->resource);
 
         if ($return === false) {
@@ -150,9 +149,6 @@ class Socket implements Stringable
      */
     public function close(): void
     {
-        if ($this->resource === null) {
-            return;
-        }
         unset(self::$map[$this->__toString()]);
         try {
             @socket_close($this->resource);
@@ -178,10 +174,8 @@ class Socket implements Stringable
      *
      * @return bool <p>Returns <code>true</code> if the connect was successful.
      * @throws Exception\SocketException If the connect was unsuccessful or if the socket is non-blocking.
-     *
      * @see Socket::listen()
      * @see Socket::create()
-     *
      * @see Socket::bind()
      */
     public function connect(string $address, int $port = 0): bool
@@ -477,10 +471,14 @@ class Socket implements Stringable
      */
     public static function importStream($stream): self
     {
+        if (!$stream instanceof SocketResource && get_resource_type($stream) === 'Unknown') {
+            throw new InvalidArgumentException('$stream must be a resource');
+        }
         $return = @socket_import_stream($stream);
 
-        if ($return === false || is_null($return)) {
-            throw new SocketException($stream instanceof Socketresource ? $stream : null);
+        // As of PHP 8, `$return` can only be {@see SocketResource} or `false`
+        if ($return === false) {
+            throw new SocketException($stream instanceof SocketResource ? $stream : null);
         }
 
         return new self($return);
@@ -764,8 +762,6 @@ class Socket implements Stringable
      */
     public function send(string $buffer, int $flags = 0, int $length = null): int
     {
-        $this->checkInvalidResourceState();
-
         if (null === $length) {
             $length = strlen($buffer);
         }
@@ -804,22 +800,10 @@ class Socket implements Stringable
      */
     public function setBlocking(bool $bool): void
     {
-        $this->checkInvalidResourceState();
-
         if ($bool) {
             @socket_set_block($this->resource);
         } else {
             @socket_set_nonblock($this->resource);
-        }
-    }
-
-    /**
-     * @throws SocketException
-     */
-    private function checkInvalidResourceState(): void
-    {
-        if (null === $this->resource) {
-            throw new SocketException('Socket is not connected');
         }
     }
 }

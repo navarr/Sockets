@@ -4,6 +4,7 @@ namespace Navarr\Socket;
 
 use Error;
 use Navarr\Socket\Exception\SocketException;
+use RuntimeException;
 
 class Server
 {
@@ -184,6 +185,10 @@ class Server
      */
     protected function loopOnce(): bool
     {
+        if ($this->masterSocket === null) {
+            throw new RuntimeException('Socket must be started before running server loop');
+        }
+
         // Get all the Sockets we should be reading from
         $read = array_merge([$this->masterSocket], $this->clients);
 
@@ -201,7 +206,7 @@ class Server
         }
 
         // If there is a new connection, add it
-        if (in_array($this->masterSocket, $read)) {
+        if ($this->masterSocket !== null && in_array($this->masterSocket, $read)) {
             unset($read[array_search($this->masterSocket, $read)]);
             $socket = $this->masterSocket->accept();
             $this->clients[] = $socket;
