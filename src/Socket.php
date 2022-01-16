@@ -97,7 +97,7 @@ class Socket implements Stringable
      * however, remains open and may be reused.</p>
      *
      * @return Socket A new Socket representation of the accepted socket.
-     * @throws Exception\SocketException If the Socket is set as non-blocking and there are no pending connections.
+     * @throws SocketException If the Socket is set as non-blocking and there are no pending connections.
      *
      * @see Socket::bind()
      * @see Socket::listen()
@@ -128,9 +128,8 @@ class Socket implements Stringable
      * @param int $port <p>(Optional) The port parameter is only used when binding an AF_INET socket, and
      * designates the port on which to listen for connections.</p>
      *
-     * @return bool <p>Returns <code>true</code> if the bind was successful.</p>
-     * @throws Exception\SocketException If the bind was unsuccessful.
-     *
+     * @return bool Returns `true` if the bind was successful.
+     * @throws SocketException If the bind was unsuccessful.
      */
     public function bind(string $address, int $port = 0): bool
     {
@@ -172,8 +171,8 @@ class Socket implements Stringable
      * @param int $port <p>(Optional) The port parameter is only used and is mandatory when connecting to an AF_INET
      * or an AF_INET6 socket, and designates the port on the remote host to which a connection should be made.</p>
      *
-     * @return bool <p>Returns <code>true</code> if the connect was successful.
-     * @throws Exception\SocketException If the connect was unsuccessful or if the socket is non-blocking.
+     * @return bool Returns <code>true</code> if connection was successful.
+     * @throws SocketException If connection was unsuccessful or if the socket is non-blocking.
      * @see Socket::listen()
      * @see Socket::create()
      * @see Socket::bind()
@@ -240,7 +239,7 @@ class Socket implements Stringable
      * allow for the possibility of partial record transmission.</p>
      *
      * @return Socket Returns a Socket object based on the successful creation of the php socket.
-     * @throws Exception\SocketException If there is an error creating the php socket.
+     * @throws SocketException If there is an error creating the php socket.
      *
      */
     public static function create(int $domain, int $type, int $protocol): self
@@ -270,7 +269,7 @@ class Socket implements Stringable
      *                     grow to. <code>SOMAXCONN</code> may be passed as the backlog parameter.</p>
      *
      * @return Socket Returns a Socket object based on the successful creation of the php socket.
-     * @throws Exception\SocketException If the socket is not successfully created.
+     * @throws SocketException If the socket is not successfully created.
      *
      * @see Socket::bind()
      * @see Socket::listen()
@@ -308,7 +307,7 @@ class Socket implements Stringable
      * of supported protocols.
      *
      * @return Socket[] An array of Socket objects containing identical sockets.
-     * @throws Exception\SocketException If the creation of the php sockets is not successful.
+     * @throws SocketException If the creation of the php sockets is not successful.
      *
      * @see Socket::create()
      *
@@ -384,7 +383,7 @@ class Socket implements Stringable
      * is also accepted, meaning the route default should be used. Returns int.</p>
      *
      * @return mixed See the descriptions based on the option being requested above.
-     * @throws Exception\SocketException If there was an error retrieving the option.
+     * @throws SocketException If there was an error retrieving the option.
      *
      */
     public function getOption(int $level, int $optname): mixed
@@ -410,7 +409,7 @@ class Socket implements Stringable
      * @param int $port (Optional) If given, this will hold the port associated to the address.
      *
      * @return bool <p>Returns <code>true</code> if the retrieval of the peer name was successful.</p>
-     * @throws Exception\SocketException <p>If the retrieval of the peer name fails or if the socket type is not
+     * @throws SocketException <p>If the retrieval of the peer name fails or if the socket type is not
      *                                   <code>AF_INET</code>, <code>AF_INET6</code>, or <code>AF_UNIX</code>.</p>
      *
      */
@@ -440,7 +439,7 @@ class Socket implements Stringable
      * @param int $port If provided, this will hold the associated port.
      *
      * @return bool <p>Returns <code>true</code> if the retrieval of the socket name was successful.</p>
-     * @throws Exception\SocketException <p>If the retrieval of the socket name fails or if the socket type is not
+     * @throws SocketException <p>If the retrieval of the socket name fails or if the socket type is not
      *                                   <code>AF_INET</code>, <code>AF_INET6</code>, or <code>AF_UNIX</code>.</p>
      *
      */
@@ -466,19 +465,19 @@ class Socket implements Stringable
      * @param resource $stream The stream resource to import.
      *
      * @return Socket Returns a Socket object based on the stream.
-     * @throws Exception\SocketException If the import of the stream is not successful.
+     * @throws SocketException If the import of the stream is not successful.
      *
      */
     public static function importStream($stream): self
     {
-        if (!$stream instanceof SocketResource && get_resource_type($stream) === 'Unknown') {
+        if (get_resource_type($stream) === 'Unknown') {
             throw new InvalidArgumentException('$stream must be a resource');
         }
         $return = @socket_import_stream($stream);
 
         // As of PHP 8, `$return` can only be {@see SocketResource} or `false`
         if ($return === false) {
-            throw new SocketException($stream instanceof SocketResource ? $stream : null);
+            throw new SocketException();
         }
 
         return new self($return);
@@ -499,8 +498,8 @@ class Socket implements Stringable
      * maximum reasonable value. There is no standard provision to find out the actual backlog value on this platform.
      * </p>
      *
-     * @return bool <p>Returns <code>true</code> on success.
-     * @throws Exception\SocketException If the listen fails.
+     * @return bool Returns <code>true</code> on success.
+     * @throws SocketException If the listen fails.
      *
      */
     public function listen(int $backlog = 0): bool
@@ -527,7 +526,7 @@ class Socket implements Stringable
      *
      * @return string Returns the data as a string. Returns a zero length string ("") when there is no more data to
      *                read.
-     * @throws Exception\SocketException If there was an error reading or if the host closed the connection.
+     * @throws SocketException If there was an error reading or if the host closed the connection.
      *
      * @see Socket::accept()
      *
@@ -563,7 +562,7 @@ class Socket implements Stringable
      * </li></ul></p>
      *
      * @return int Returns the number of bytes received.
-     * @throws Exception\SocketException If there was an error receiving data.
+     * @throws SocketException If there was an error receiving data.
      *
      */
     public function receive(string &$buffer, int $length, int $flags): int
@@ -714,7 +713,7 @@ class Socket implements Stringable
      * socket. If this length is greater than the buffer length, it is silently truncated to the length of the buffer.
      *
      * @return int Returns the number of bytes successfully written to the socket.
-     * @throws Exception\SocketException If there was a failure.
+     * @throws SocketException If there was a failure.
      *
      */
     public function write(string $buffer, int $length = null): int
@@ -757,7 +756,7 @@ class Socket implements Stringable
      * @param int $length The number of bytes that will be sent to the remote host from buffer.
      *
      * @return int Returns the number of bytes sent.
-     * @throws Exception\SocketException If there was a failure.
+     * @throws SocketException If there was a failure.
      *
      */
     public function send(string $buffer, int $flags = 0, int $length = null): int
