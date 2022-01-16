@@ -1,12 +1,12 @@
 # Sockets 
 
-[![Build Status](https://travis-ci.org/navarr/Sockets.svg)](https://travis-ci.org/navarr/Sockets)
-[![Scrutinizer](https://scrutinizer-ci.com/g/navarr/Sockets/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
-[![Code Coverage](https://scrutinizer-ci.com/g/navarr/Sockets/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/navarr/Sockets/)
-[![Latest Stable Version](https://poser.pugx.org/navarr/sockets/v/stable.svg)](https://packagist.org/packages/navarr/sockets)
-[![Total Downloads](https://poser.pugx.org/navarr/sockets/downloads.svg)](https://packagist.org/packages/navarr/sockets) 
-[![Latest Unstable Version](https://poser.pugx.org/navarr/sockets/v/unstable.svg)](https://packagist.org/packages/navarr/sockets) 
-[![License](https://poser.pugx.org/navarr/sockets/license.svg)](https://packagist.org/packages/navarr/sockets)
+[![Latest Stable Version](http://poser.pugx.org/navarr/Sockets/v)](https://packagist.org/packages/navarr/Sockets)
+[![Total Downloads](http://poser.pugx.org/navarr/Sockets/downloads)](https://packagist.org/packages/navarr/Sockets)
+[![Latest Unstable Version](http://poser.pugx.org/navarr/Sockets/v/unstable)](https://packagist.org/packages/navarr/Sockets)
+[![License](http://poser.pugx.org/navarr/Sockets/license)](https://packagist.org/packages/navarr/Sockets)  
+![Tests](https://github.com/navarr/Sockets/actions/workflows/commit.yml/badge.svg)
+![Code Coverage](https://codecov.io/gh/navarr/Sockets/branch/main/graph/badge.svg?token=C9DtrzMCrD)
+[![Mutation Score](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fnavarr%2FSockets%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/navarr/Sockets/main)
 
 Sockets is a PHP Library intent on making working with PHP Sockets easier, including the creation and management of a Socket Server.
 
