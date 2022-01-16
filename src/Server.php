@@ -193,8 +193,8 @@ class Server
         $read = array_merge([$this->masterSocket], $this->clients);
 
         // Set up a block call to socket_select
-        $write = null;
-        $except = null;
+        $write = [];
+        $except = [];
         $ret = Socket::select($read, $write, $except, $this->timeout);
         if (
             !is_null($this->timeout)
