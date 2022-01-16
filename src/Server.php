@@ -3,7 +3,6 @@
 namespace Navarr\Socket;
 
 use Navarr\Socket\Exception\SocketException;
-use Navarr\Socket\Exception\SocketException as SocketExceptionAlias;
 
 class Server
 {
@@ -141,7 +140,7 @@ class Server
      *
      * If you call {@see run} you do not need to call this method.
      *
-     * @throws SocketExceptionAlias
+     * @throws SocketException
      */
     public function start(): void
     {
@@ -160,7 +159,7 @@ class Server
     /**
      * Run the Server for as long as loopOnce returns true.
      *
-     * @throws SocketExceptionAlias
+     * @throws SocketException
      * @see loopOnce
      */
     public function run(): void
@@ -180,8 +179,7 @@ class Server
      * This is the main server loop.  This code is responsible for adding connections and triggering hooks.
      *
      * @return bool Whether or not to shutdown the server
-     *@throws SocketExceptionAlias
-     *
+     * @throws SocketException
      */
     protected function loopOnce(): bool
     {
@@ -241,7 +239,7 @@ class Server
      * Overrideable Read Functionality.
      *
      * @param Socket $client
-     * @throws SocketExceptionAlias
+     * @throws SocketException
      */
     protected function read(Socket $client): string
     {
@@ -282,7 +280,7 @@ class Server
      *
      * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT, HOOK_TIMEOUT)
      * @param Socket $client
-     * @param string $input   Message Sent along with the Trigger
+     * @param string $input Message Sent along with the Trigger
      *
      * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
@@ -308,9 +306,9 @@ class Server
     /**
      * Attach a Listener to a Hook.
      *
-     * @param string $command  Hook to listen for
-     * @param callable $callable A callable with the signature (Server, Socket, string).
-     *                           Callable should return false if it wishes to stop the server, and true if it wishes to continue.
+     * @param string $command Hook to listen for
+     * @param callable $callable A callable with the signature (Server, Socket, string). Callable should return false
+     * if it wishes to stop the server, and true if it wishes to continue.
      *
      * @return void
      */
@@ -332,7 +330,7 @@ class Server
     /**
      * Remove the provided Callable from the provided Hook.
      *
-     * @param string $command  Hook to remove callable from
+     * @param string $command Hook to remove callable from
      * @param callable $callable The callable to be removed
      *
      * @return void
