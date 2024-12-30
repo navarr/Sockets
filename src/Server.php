@@ -286,11 +286,11 @@ class Server
      *
      * @param string $command Hook to listen for (e.g. HOOK_CONNECT, HOOK_INPUT, HOOK_DISCONNECT, HOOK_TIMEOUT)
      * @param Socket $client
-     * @param string $input Message Sent along with the Trigger
+     * @param string|null $input Message Sent along with the Trigger
      *
      * @return bool Whether or not to continue running the server (true: continue, false: shutdown)
      */
-    protected function triggerHooks(string $command, Socket $client, string $input = null): bool
+    protected function triggerHooks(string $command, Socket $client, ?string $input = null): bool
     {
         if (isset($this->hooks[$command])) {
             foreach ($this->hooks[$command] as $callable) {

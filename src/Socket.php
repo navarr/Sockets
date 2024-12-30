@@ -709,14 +709,14 @@ class Socket implements Stringable
      * <p>The function <code>write()</code> writes to the socket from the given buffer.</p>
      *
      * @param string $buffer The buffer to be written.
-     * @param ?int $length The optional parameter length can specify an alternate length of bytes written to the
+     * @param int|null $length The optional parameter length can specify an alternate length of bytes written to the
      * socket. If this length is greater than the buffer length, it is silently truncated to the length of the buffer.
      *
      * @return int Returns the number of bytes successfully written to the socket.
      * @throws SocketException If there was a failure.
      *
      */
-    public function write(string $buffer, int $length = null): int
+    public function write(string $buffer, ?int $length = null): int
     {
         if (null === $length) {
             $length = strlen($buffer);
@@ -753,13 +753,13 @@ class Socket implements Stringable
      * <li><code>MSG_EOF</code> - Close the sender side of the socket and include an appropriate notification
      * of this at the end of the sent data. The sent data completes the transaction.</li>
      * <li><code>MSG_DONTROUTE</code> - Bypass routing, use direct interface.</li></ul></p>
-     * @param int $length The number of bytes that will be sent to the remote host from buffer.
+     * @param int|null $length The number of bytes that will be sent to the remote host from buffer.
      *
      * @return int Returns the number of bytes sent.
      * @throws SocketException If there was a failure.
      *
      */
-    public function send(string $buffer, int $flags = 0, int $length = null): int
+    public function send(string $buffer, int $flags = 0, ?int $length = null): int
     {
         if (null === $length) {
             $length = strlen($buffer);
