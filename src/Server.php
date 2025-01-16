@@ -196,26 +196,32 @@ class Server
         $write = [];
         $except = [];
         $ret = Socket::select($read, $write, $except, $this->timeout);
+        
+        // Clean up arrays we no longer need
+        unset($write, $except);
+        
         if (
             !is_null($this->timeout)
             && $ret === 0
             && $this->triggerHooks(self::HOOK_TIMEOUT, $this->masterSocket) === false
         ) {
-            // This only happens when a hook tells the server to shut itself down.
+            unset($read, $ret);
             return false;
         }
 
         // If there is a new connection, add it
         if ($this->masterSocket !== null && in_array($this->masterSocket, $read)) {
-            unset($read[array_search($this->masterSocket, $read)]);
+            $masterSocketIndex = array_search($this->masterSocket, $read);
+            unset($read[$masterSocketIndex]);
+            
             $socket = $this->masterSocket->accept();
             $this->clients[] = $socket;
 
             if ($this->triggerHooks(self::HOOK_CONNECT, $socket) === false) {
-                // This only happens when a hook tells the server to shut itself down.
+                unset($socket, $read, $ret, $masterSocketIndex);
                 return false;
             }
-            unset($socket);
+            unset($socket, $masterSocketIndex);
         }
 
         // Check for input from each client
@@ -223,21 +229,23 @@ class Server
             $input = $this->read($client);
 
             if ($input === '') {
-                if ($this->disconnect($client) === false) {
-                    // This only happens when a hook tells the server to shut itself down.
+                $disconnectResult = $this->disconnect($client);
+                unset($input);
+                
+                if ($disconnectResult === false) {
+                    unset($read, $ret, $client);
                     return false;
                 }
             } elseif ($this->triggerHooks(self::HOOK_INPUT, $client, $input) === false) {
-                // This only happens when a hook tells the server to shut itself down.
+                unset($input, $read, $ret, $client);
                 return false;
             }
             unset($input);
         }
 
-        // Unset the variables we were holding on to
-        unset($read, $write, $except);
+        // Clean up remaining variables
+        unset($read, $ret);
 
-        // Tells self::run to Continue the Loop
         return true;
     }
 
@@ -297,9 +305,11 @@ class Server
                 $continue = $callable($this, $client, $input);
 
                 if ($continue === self::RETURN_HALT_HOOK) {
+                    unset($continue);
                     break;
                 }
                 if ($continue === self::RETURN_HALT_SERVER) {
+                    unset($continue);
                     return false;
                 }
                 unset($continue);
@@ -345,7 +355,8 @@ class Server
     {
         if (isset($this->hooks[$command]) && in_array($callable, $this->hooks[$command])) {
             $hook = array_search($callable, $this->hooks[$command]);
-            unset($this->hooks[$command][$hook], $hook);
+            unset($this->hooks[$command][$hook]);
+            unset($hook);
         }
     }
 
@@ -356,28 +367,33 @@ class Server
      */
     private function shutDownEverything(): void
     {
-        foreach ($this->clients as $client) {
+        foreach ($this->clients as $key => $client) {
             $this->disconnect($client);
+            unset($this->clients[$key], $client);
         }
+        
         try {
-            $this->masterSocket?->close();
+            if ($this->masterSocket !== null) {
+                $this->masterSocket->close();
+                unset($this->masterSocket);
+            }
         } catch (Error $e) {
-            // Haven't solved this one yet, but harmless.
             if (!str_contains($e->getMessage(), 'must not be accessed before initialization')) {
                 throw $e;
             }
+            unset($e);
         }
+
+        // Clean up all remaining properties
         unset(
             $this->hooks,
             $this->address,
             $this->port,
             $this->timeout,
             $this->domain,
-            $this->masterSocket,
             $this->maxClients,
             $this->maxRead,
             $this->clients,
             $this->readType
         );
     }
-}
