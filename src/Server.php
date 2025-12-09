@@ -359,25 +359,26 @@ class Server
         foreach ($this->clients as $client) {
             $this->disconnect($client);
         }
-        try {
-            $this->masterSocket?->close();
-        } catch (Error $e) {
-            // Haven't solved this one yet, but harmless.
-            if (!str_contains($e->getMessage(), 'must not be accessed before initialization')) {
+
+        if ($this->masterSocket !== null) {
+            try {
+                $this->masterSocket->close();
+            } catch (Error $e) {
                 throw $e;
             }
         }
+
         unset(
-            $this->hooks,
-            $this->address,
-            $this->port,
-            $this->timeout,
-            $this->domain,
-            $this->masterSocket,
-            $this->maxClients,
-            $this->maxRead,
-            $this->clients,
-            $this->readType
-        );
+                $this->hooks,
+                $this->address,
+                $this->port,
+                $this->timeout,
+                $this->domain,
+                $this->masterSocket,
+                $this->maxClients,
+                $this->maxRead,
+                $this->clients,
+                $this->readType
+            );
     }
 }
