@@ -1,6 +1,6 @@
 parameters:
     treatPhpDocTypesAsCertain: true
-    level: 9
+    level: max
     paths:
         - src
     ignoreErrors:
